@@ -13,8 +13,7 @@ class MyApp extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<MyApp>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin {
   late TabController controller;
 
   @override
