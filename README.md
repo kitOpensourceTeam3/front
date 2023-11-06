@@ -1,20 +1,6 @@
-<<<<<<< HEAD
-# flutter_application
+# 오픈소스프로젝트 3팀
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
-# front
->>>>>>> aaacf863a20e37fd7f59b2c4b9aef3b49900f8e1
+김민
+유승모
+조진혁
+김태현
