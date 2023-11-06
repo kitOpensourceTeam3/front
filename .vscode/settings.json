@@ -1,3 +1,14 @@
 {
-    "dart.lineLength": 100
+    "dart.lineLength": 100,
+    "git-graph.commitDetailsView.location": "Inline",
+    "git-graph.defaultColumnVisibility": {
+        
+        "Date": true,
+        "Author": true,
+        "Commit": true
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.formatOnSave": true
 }
