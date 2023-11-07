@@ -35,7 +35,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.search),
-                onPressed: () {},
+                onPressed: () {}, //기능
               ),
               IconButton(
                 icon: const Icon(Icons.more_vert), // Three-dot icon for more options
