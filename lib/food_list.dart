@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/New_Food.dart';
 
 class FoodListScreen extends StatelessWidget {
   const FoodListScreen({super.key});
@@ -25,6 +26,19 @@ class FoodListScreen extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: Builder(
+        builder: (context) => FloatingActionButton(
+          onPressed: () {
+            // AddFoodScreen으로 화면 전환
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NewFoodScreen()),
+            );
+          },
+          child: const Icon(Icons.add), // '+' 아이콘
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -39,6 +53,10 @@ class FoodListScreen extends StatelessWidget {
         return InkWell(
             onTap: () {
               // Handle button tap here
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => const NewFoodScreen()),
+              // );
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20), // 버튼 라운드 하드처리
