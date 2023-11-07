@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/New_Food.dart';
 import 'package:flutter_application/Add_Food.dart';
+import 'package:flutter_application/food_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +31,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
-            title: const Text('AppName'),
+            title: const Text('냉장고를 부탁해'),
             bottom: TabBar(
               controller: controller,
               tabs: const <Widget>[
@@ -46,19 +47,19 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
             children: const <Widget>[
               Center(
                 child: Text(
-                  'One Screen',
+                  '냉장고 식품창',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
               ),
               Center(
                 child: Text(
-                  'Two Screen',
+                  '냉동고 식품창',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
               ),
               Center(
                 child: Text(
-                  'Three Screen',
+                  '실온 식품창',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
               )
@@ -70,13 +71,13 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
                 // AddFoodScreen으로 화면 전환
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AddFoodScreen()),
+                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add), // '+' 아이콘
             ),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // 우측 하단 위치
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         ));
   }
 }
