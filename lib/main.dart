@@ -34,8 +34,8 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
             title: const Text('냉장고를 부탁해'),
             actions: <Widget>[
               IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {}, //기능
+                icon: const Icon(Icons.search), //돋보기
+                onPressed: () {},
               ),
               IconButton(
                 icon: const Icon(Icons.more_vert), // Three-dot icon for more options
