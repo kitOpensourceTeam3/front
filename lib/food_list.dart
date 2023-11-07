@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/New_Food.dart';
+import 'package:flutter_application/Add_Food.dart';
 
 class FoodListScreen extends StatelessWidget {
   const FoodListScreen({super.key});
@@ -53,10 +54,10 @@ class FoodListScreen extends StatelessWidget {
         return InkWell(
             onTap: () {
               // Handle button tap here
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const NewFoodScreen()),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddFoodScreen()),
+              );
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20), // 버튼 라운드 하드처리
