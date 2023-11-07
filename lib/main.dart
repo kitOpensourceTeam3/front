@@ -30,7 +30,7 @@ class _HomeScreenState extends State<MyApp>
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
-            title: const Text('AppName'),
+            title: const Text('냉장고를 부탁해'),
             bottom: TabBar(
               controller: controller,
               tabs: const <Widget>[
