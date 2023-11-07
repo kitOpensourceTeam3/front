@@ -32,6 +32,16 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
         home: Scaffold(
           appBar: AppBar(
             title: const Text('냉장고를 부탁해'),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.search), //돋보기. 추가 기능 구현 필요
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: const Icon(Icons.more_vert), // Three-dot icon for more options
+                onPressed: () {},
+              ),
+            ],
             bottom: TabBar(
               controller: controller,
               tabs: const <Widget>[
