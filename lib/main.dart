@@ -70,7 +70,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
                 // AddFoodScreen으로 화면 전환
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const NewFoodScreen()),
+                  MaterialPageRoute(builder: (context) => const AddFoodScreen()),
                 );
               },
               child: const Icon(Icons.add), // '+' 아이콘
