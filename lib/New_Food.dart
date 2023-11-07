@@ -91,6 +91,15 @@ class NewFoodScreen extends StatelessWidget {
                 ),
               ),
             ),
+            Positioned(
+                bottom: 30,
+                right: 30,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // 버튼이 눌렸을 때 실행할 코드를 여기에 작성하세요.
+                  },
+                  child: const Text('확인'),
+                ))
           ],
         ),
       ),
