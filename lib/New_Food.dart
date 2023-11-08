@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 class NewFoodScreen extends StatelessWidget {
@@ -92,14 +94,26 @@ class NewFoodScreen extends StatelessWidget {
               ),
             ),
             Positioned(
-                bottom: 30,
-                right: 30,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // 버튼이 눌렸을 때 실행할 코드를 여기에 작성하세요.
-                  },
-                  child: const Text('확인'),
-                ))
+              top: 530, // 메모 입력 공간 아래에 적절한 간격을 두세요.
+              left: 50,
+              right: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  // '추가' 버튼이 눌렸을 때의 동작을 구현하세요.
+                  // 예를 들어, 입력된 데이터를 서버에 전송하거나 로컬 데이터베이스에 저장할 수 있습니다.
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  backgroundColor: Colors.blue, // 버튼 패딩을 지정합니다.
+                  textStyle: const TextStyle(fontSize: 18), // 버튼 색상을 지정합니다.
+                  shape: RoundedRectangleBorder(
+                    // 버튼외곽선의 모양
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                child: const Text('추가'),
+              ),
+            ),
           ],
         ),
       ),
