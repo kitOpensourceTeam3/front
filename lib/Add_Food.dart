@@ -13,7 +13,9 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   String selectedStorage = '냉장실'; // 초기 선택된 보관장소 값
   final List<String> storageOptions = ['냉장실', '냉동실', '상온실']; // 보관장소 옵션들
   int quantity = 1; // 초기 수량 값
-  DateTime? selectedDate; // 선택된 날짜를 저장할 변수
+  DateTime? selectedDate; // 선택된 등록일 날짜를 저장할 변수
+  DateTime? expirationDate; // 선택된 소비기한 날짜를 저장할 변수
+  TextEditingController noteController = TextEditingController(); // 메모를 위한 컨트롤러
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '새로운 식품',
+          '식품 추가하기',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
@@ -174,7 +176,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                 thickness: 1,
               ),
             ),
-            Positioned(
+             Positioned(
               top: 260, // 구분선 아래에 적절한 간격을 두세요.
               left: 50,
               right: 50,
@@ -211,6 +213,91 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+            Positioned(
+              top: 300, // '등록일' 선택기 아래에 적절한 간격을 두세요.
+              left: 50,
+              right: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '소비기한',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: expirationDate ?? DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2101),
+                      );
+                      if (picked != null && picked != expirationDate) {
+                        setState(() {
+                          expirationDate = picked;
+                        });
+                      }
+                    },
+                    child: Text(
+                      expirationDate == null
+                          ? '날짜 선택'
+                          : DateFormat('yyyy-MM-dd').format(expirationDate!),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // 메모 입력 공간
+            Positioned(
+              top: 400, // '소비기한' 선택기 아래에 적절한 간격을 두세요.
+              left: 50,
+              right: 50,
+              child: Container(
+                height: 120, // 메모 입력 공간의 높이를 100픽셀로 설정
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300], // 회색 배경
+                  borderRadius: BorderRadius.circular(5), // 모서리를 둥글게
+                ),
+                child: TextField(
+                  controller: noteController,
+                  maxLines: null, // 무제한 줄 수
+                  keyboardType: TextInputType.multiline, // 여러 줄 입력 가능
+                  decoration: const InputDecoration(
+                    hintText: '메모를 입력하세요',
+                    border: InputBorder.none, // 테두리 없음
+                    contentPadding: EdgeInsets.symmetric(vertical: 10), // 상하 패딩 추가
+                  ),
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+            ),
+            // '추가' 버튼
+            Positioned(
+              top: 530, // 메모 입력 공간 아래에 적절한 간격을 두세요.
+              left: 50,
+              right: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  // '추가' 버튼이 눌렸을 때의 동작을 구현하세요.
+                  // 예를 들어, 입력된 데이터를 서버에 전송하거나 로컬 데이터베이스에 저장할 수 있습니다.
+                },
+                child: const Text('추가'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15.0), // 버튼 패딩을 지정합니다.
+                  textStyle: const TextStyle(fontSize: 18), // 버튼 텍스트 스타일을 지정합니다.
+                  primary: Colors.blue, // 버튼 색상을 지정합니다.
+                   shape: RoundedRectangleBorder( // 버튼외곽선의 모양
+                  borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
               ),
             ),
           ],
