@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -161,11 +163,11 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   }
 
   Positioned buildDivider() {
-    return Positioned(
+    return const Positioned(
       top: 240,
       left: 50,
       right: 50,
-      child: const Divider(color: Colors.grey, thickness: 1),
+      child: Divider(color: Colors.grey, thickness: 1),
     );
   }
 
@@ -243,15 +245,15 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
           // '추가' 버튼이 눌렸을 때의 동작을 구현하세요.
           // 예를 들어, 입력된 데이터를 서버에 전송하거나 로컬 데이터베이스에 저장할 수 있습니다.
         },
-        child: const Text('추가'),
         style: ElevatedButton.styleFrom(
-          primary: Colors.blue,
+          backgroundColor: Colors.blue,
           padding: const EdgeInsets.symmetric(vertical: 15.0),
           textStyle: const TextStyle(fontSize: 18),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
         ),
+        child: const Text('추가'),
       ),
     );
   }
