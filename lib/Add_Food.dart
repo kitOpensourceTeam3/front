@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -17,14 +19,11 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   DateTime? expirationDate;
   TextEditingController noteController = TextEditingController();
 
-  final TextStyle boldStyle =
-      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final TextStyle hintStyle =
-      const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
+  final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
   final InputBorder borderStyle =
       const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
-  final EdgeInsetsGeometry paddingSymmetric10 =
-      const EdgeInsets.symmetric(horizontal: 10);
+  final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
 
   @override
   Widget build(BuildContext context) {
@@ -164,11 +163,11 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   }
 
   Positioned buildDivider() {
-    return Positioned(
+    return const Positioned(
       top: 240,
       left: 50,
       right: 50,
-      child: const Divider(color: Colors.grey, thickness: 1),
+      child: Divider(color: Colors.grey, thickness: 1),
     );
   }
 
@@ -201,10 +200,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             },
             child: Text(
               date == null ? '날짜 선택' : DateFormat('yyyy-MM-dd').format(date),
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
             ),
           ),
         ],
@@ -246,15 +242,15 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       right: 50,
       child: ElevatedButton(
         onPressed: () {},
-        child: const Text('추가'),
         style: ElevatedButton.styleFrom(
-          primary: Colors.blue,
+          backgroundColor: Colors.blue,
           padding: const EdgeInsets.symmetric(vertical: 15.0),
           textStyle: const TextStyle(fontSize: 18),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
         ),
+        child: const Text('추가'),
       ),
     );
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 class NewFoodScreen extends StatelessWidget {
@@ -101,9 +103,9 @@ class NewFoodScreen extends StatelessWidget {
                   // 예를 들어, 입력된 데이터를 서버에 전송하거나 로컬 데이터베이스에 저장할 수 있습니다.
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15.0), // 버튼 패딩을 지정합니다.
-                  textStyle: const TextStyle(fontSize: 18), // 버튼 텍스트 스타일을 지정합니다.
-                  primary: Colors.blue, // 버튼 색상을 지정합니다.
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  backgroundColor: Colors.blue, // 버튼 패딩을 지정합니다.
+                  textStyle: const TextStyle(fontSize: 18), // 버튼 색상을 지정합니다.
                   shape: RoundedRectangleBorder(
                     // 버튼외곽선의 모양
                     borderRadius: BorderRadius.circular(20.0),
