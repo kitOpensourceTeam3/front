@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 
 class AddFoodScreen extends StatefulWidget {
   const AddFoodScreen({Key? key}) : super(key: key);
@@ -10,18 +10,21 @@ class AddFoodScreen extends StatefulWidget {
 
 class _AddFoodScreenState extends State<AddFoodScreen> {
   String imagePath = 'images/cooking/salad.png';
-  String selectedStorage = '냉장고'; 
-  final List<String> storageOptions = ['냉장고', '냉동고', '상온']; 
-  int quantity = 1; 
-  DateTime? selectedDate; 
-  DateTime? expirationDate; 
-  TextEditingController noteController = TextEditingController(); 
+  String selectedStorage = '냉장고';
+  final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
+  int quantity = 1;
+  DateTime? selectedDate;
+  DateTime? expirationDate;
+  TextEditingController noteController = TextEditingController();
 
-  
-  final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
-  final InputBorder borderStyle = const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
-  final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
+  final TextStyle boldStyle =
+      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle hintStyle =
+      const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
+  final InputBorder borderStyle =
+      const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
+  final EdgeInsetsGeometry paddingSymmetric10 =
+      const EdgeInsets.symmetric(horizontal: 10);
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +201,10 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             },
             child: Text(
               date == null ? '날짜 선택' : DateFormat('yyyy-MM-dd').format(date),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue),
             ),
           ),
         ],
@@ -239,9 +245,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       left: 50,
       right: 50,
       child: ElevatedButton(
-        onPressed: () {
-
-        },
+        onPressed: () {},
         child: const Text('추가'),
         style: ElevatedButton.styleFrom(
           primary: Colors.blue,
