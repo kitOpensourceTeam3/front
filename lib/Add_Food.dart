@@ -240,8 +240,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       right: 50,
       child: ElevatedButton(
         onPressed: () {
-          // '추가' 버튼이 눌렸을 때의 동작을 구현하세요.
-          // 예를 들어, 입력된 데이터를 서버에 전송하거나 로컬 데이터베이스에 저장할 수 있습니다.
+
         },
         child: const Text('추가'),
         style: ElevatedButton.styleFrom(
