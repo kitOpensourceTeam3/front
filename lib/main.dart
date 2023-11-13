@@ -16,13 +16,21 @@ class MyApp extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<MyApp>
+    with SingleTickerProviderStateMixin {
   late TabController controller;
+  List<NewTile> fridgeTiles = []; //아마 냉장실 리스트타일들 관리하는 리스트
 
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 3, vsync: this);
+  }
+
+  void deleteTile(NewTile tile) {
+    setState(() {
+      fridgeTiles.remove(tile);
+    });
   }
 
   @override
@@ -34,7 +42,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
             title: const Text('냉장고를 부탁해'),
             actions: <Widget>[
               IconButton(
-                icon: const Icon(Icons.refresh), //돋보기. 추가 기능 구현 필요
+                icon: const Icon(Icons.refresh), //화면refresh. 추가 기능 구현 필요
                 onPressed: () {},
               ),
               IconButton(
@@ -42,7 +50,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
                 onPressed: () {},
               ),
               IconButton(
-                icon: const Icon(Icons.more_vert), // Three-dot icon for more options
+                icon: const Icon(Icons.more_vert), // 추가기능 구현 필요
                 onPressed: () {},
               ),
             ],
@@ -58,25 +66,24 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
           //add........................
           body: TabBarView(
             controller: controller,
-            children: const <Widget>[
-              Center(
-                child: Text(
-                  '냉장고 식품창',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
+            children: <Widget>[
+              // 냉장고 탭
+              ListView(
+                children: <Widget>[
+                  NewTile(remainingDays: 'D-7', foodName: '식품 1'),
+                  NewTile(remainingDays: 'D-7', foodName: '식품 2')
+                ],
               ),
-              Center(
-                child: Text(
-                  '냉동고 식품창',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
+
+              // 냉동실 탭
+              ListView(
+                children: <Widget>[],
               ),
-              Center(
-                child: Text(
-                  '실온 식품창',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-              )
+
+              // 실온 탭
+              ListView(
+                children: <Widget>[],
+              ),
             ],
           ),
           floatingActionButton: Builder(
@@ -85,13 +92,60 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
                 // AddFoodScreen으로 화면 전환
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const FoodListScreen()),
                 );
               },
-              child: const Icon(Icons.add), // '+' 아이콘
+              child: const Icon(Icons.add),
             ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         ));
+  }
+}
+
+class NewTile extends StatelessWidget {
+  final String remainingDays;
+  final String foodName;
+  final Function()? onEdit;
+  final Function()? onDelete;
+
+  NewTile({
+    required this.remainingDays,
+    required this.foodName,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      child: ListTile(
+        title: Text(foodName),
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              remainingDays,
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: onEdit,
+            ),
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: onDelete,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

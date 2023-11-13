@@ -15,7 +15,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   String selectedStorage = '냉장고';
   final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
   int quantity = 1;
-  DateTime? selectedDate;
+  DateTime selectedDate = DateTime.now();
   DateTime? expirationDate;
   TextEditingController noteController = TextEditingController();
 
