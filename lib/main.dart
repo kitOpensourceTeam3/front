@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, unused_import
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application/Edit_Food.dart';
 import 'package:flutter_application/New_Food.dart';
 import 'package:flutter_application/Add_Food.dart';
 import 'package:flutter_application/food_list.dart';
@@ -16,8 +17,7 @@ class MyApp extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<MyApp>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin {
   late TabController controller;
   List<NewTile> fridgeTiles = []; //아마 냉장실 리스트타일들 관리하는 리스트
 
@@ -92,8 +92,7 @@ class _HomeScreenState extends State<MyApp>
                 // AddFoodScreen으로 화면 전환
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add),
@@ -137,12 +136,14 @@ class NewTile extends StatelessWidget {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.edit),
-              onPressed: onEdit,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EditFoodScreen()),
+                );
+              },
             ),
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: onDelete,
-            ),
+            IconButton(icon: Icon(Icons.delete), onPressed: onDelete),
           ],
         ),
       ),
