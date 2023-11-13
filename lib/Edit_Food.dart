@@ -3,14 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class AddFoodScreen extends StatefulWidget {
-  const AddFoodScreen({Key? key}) : super(key: key);
+class EditFoodScreen extends StatefulWidget {
+  const EditFoodScreen({Key? key}) : super(key: key);
 
   @override
-  _AddFoodScreenState createState() => _AddFoodScreenState();
+  _EditFoodScreenState createState() => _EditFoodScreenState();
 }
 
-class _AddFoodScreenState extends State<AddFoodScreen> {
+class _EditFoodScreenState extends State<EditFoodScreen> {
   String imagePath = 'images/cooking/salad.png';
   String selectedStorage = '냉장고';
   final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
@@ -19,22 +19,27 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   DateTime? expirationDate;
   TextEditingController noteController = TextEditingController();
 
-  final TextStyle boldStyle =
-      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final TextStyle hintStyle =
-      const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
+  final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
   final InputBorder borderStyle =
       const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
-  final EdgeInsetsGeometry paddingSymmetric10 =
-      const EdgeInsets.symmetric(horizontal: 10);
+  final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('식품 추가하기', style: TextStyle(color: Colors.black)),
+        title: const Text('식품 정보 수정', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete), // 휴지통 아이콘을 사용하거나 다른 아이콘을 선택할 수 있습니다.
+            onPressed: () {
+              // 휴지통 아이콘을 누르면 실행될 함수를 여기에 추가하세요.
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Stack(
@@ -203,10 +208,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             },
             child: Text(
               date == null ? '날짜 선택' : DateFormat('yyyy-MM-dd').format(date),
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
             ),
           ),
         ],
@@ -256,7 +258,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             borderRadius: BorderRadius.circular(20.0),
           ),
         ),
-        child: const Text('추가'),
+        child: const Text('수정'),
       ),
     );
   }
