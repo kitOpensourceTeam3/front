@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -13,7 +15,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   String selectedStorage = '냉장고';
   final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
   int quantity = 1;
-  DateTime? selectedDate;
+  DateTime selectedDate = DateTime.now();
   DateTime? expirationDate;
   TextEditingController noteController = TextEditingController();
 
@@ -164,11 +166,11 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   }
 
   Positioned buildDivider() {
-    return Positioned(
+    return const Positioned(
       top: 240,
       left: 50,
       right: 50,
-      child: const Divider(color: Colors.grey, thickness: 1),
+      child: Divider(color: Colors.grey, thickness: 1),
     );
   }
 
@@ -246,15 +248,15 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       right: 50,
       child: ElevatedButton(
         onPressed: () {},
-        child: const Text('추가'),
         style: ElevatedButton.styleFrom(
-          primary: Colors.blue,
+          backgroundColor: Colors.blue,
           padding: const EdgeInsets.symmetric(vertical: 15.0),
           textStyle: const TextStyle(fontSize: 18),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
         ),
+        child: const Text('추가'),
       ),
     );
   }
