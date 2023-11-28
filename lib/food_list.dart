@@ -10,7 +10,7 @@ class FoodListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '음식 추가',
+          '식품 추가',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
