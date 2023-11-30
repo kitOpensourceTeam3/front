@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -22,7 +23,8 @@ class MyApp extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<MyApp>
+    with SingleTickerProviderStateMixin {
   late TabController controller;
   List<NewTile> fridgeTiles = []; //아마 냉장실 리스트타일들 관리하는 리스트
 
@@ -97,7 +99,8 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
                 // AddFoodScreen으로 화면 전환
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add),
@@ -144,7 +147,8 @@ class NewTile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const EditFoodScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const EditFoodScreen()),
                 );
               },
             ),
