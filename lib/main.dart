@@ -57,7 +57,7 @@ class _HomeScreenState extends State<MyApp>
                 onPressed: () {},
               ),
               IconButton(
-                icon: const Icon(Icons.more_vert), // 추가기능 구현 필요
+                icon: const Icon(Icons.more_vert), // 3점 추가기능 구현 필요
                 onPressed: () {},
               ),
             ],
