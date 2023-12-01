@@ -64,9 +64,7 @@ class AuthWidgetState extends State<AuthWidget> {
           // 로그인 성공 시, MainApp 화면으로 이동
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const items_app.MyApp()), // ItemsScreen으로 이동
+            MaterialPageRoute(builder: (context) => const items_app.MyApp()), // ItemsScreen으로 이동
           );
           showToast('login success');
         } else {
