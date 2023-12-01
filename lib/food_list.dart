@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/New_Food.dart';
 import 'package:flutter_application/Add_Food.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -62,19 +61,6 @@ class FoodListScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: Builder(
-        builder: (context) => FloatingActionButton(
-          onPressed: () {
-            // AddFoodScreen으로 화면 전환
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const NewFoodScreen()),
-            );
-          },
-          child: const Icon(Icons.add), // '+' 아이콘
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
