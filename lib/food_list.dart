@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/New_Food.dart';
 import 'package:flutter_application/Add_Food.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_options.dart';
 
 class FoodListScreen extends StatelessWidget {
   const FoodListScreen({super.key});
@@ -18,14 +21,46 @@ class FoodListScreen extends StatelessWidget {
           color: Colors.black,
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: buildMainMenu(),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('food_type').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('오류가 발생했습니다.');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          }
+
+          return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5,
+              childAspectRatio: 1.0,
             ),
-          ),
-        ],
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var foodType = snapshot.data!.docs[index];
+              return InkWell(
+                onTap: () {
+                  // 버튼 클릭 시 동작
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AddFoodScreen()),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    color: Colors.blue,
+                    child: Center(
+                      child: Text(foodType['name']), // name 필드의 데이터 표시
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: Builder(
         builder: (context) => FloatingActionButton(
@@ -40,36 +75,6 @@ class FoodListScreen extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget buildMainMenu() {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        childAspectRatio: 1.0,
-      ),
-      itemCount: 8,
-      itemBuilder: (BuildContext context, int index) {
-        return InkWell(
-            onTap: () {
-              // Handle button tap here
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddFoodScreen()),
-              );
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20), // 버튼 라운드 하드처리
-              child: Container(
-                margin: const EdgeInsets.all(8),
-                color: Colors.blue,
-                child: Center(
-                  child: Text('식품 버튼 ${index + 1}'),
-                ),
-              ),
-            ));
-      },
     );
   }
 }
