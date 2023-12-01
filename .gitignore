@@ -47,7 +47,6 @@ app.*.map.json
 firebase_options.dart
 google-services.json
 firebase_app_id_file.json
-firebase_app_id_file copy.json
 GoogleService-Info.plist
 
 # Flutter-related
