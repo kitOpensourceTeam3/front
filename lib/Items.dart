@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/Edit_Food.dart';
-import 'package:flutter_application/New_Food.dart';
 import 'package:flutter_application/Add_Food.dart';
 import 'package:flutter_application/food_list.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -58,8 +57,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
 
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const AuthWidget()),
+                      MaterialPageRoute(builder: (context) => const AuthWidget()),
                     );
                   }
                 },

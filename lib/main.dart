@@ -1,5 +1,5 @@
 // ignore_for_file: avoid_print
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const AuthWidget(), // <- home에 추가하여 처음부터 실행
+      home: const AuthWidget(),
     );
   }
 }
@@ -47,11 +47,10 @@ class AuthWidget extends StatefulWidget {
 
 class AuthWidgetState extends State<AuthWidget> {
   final _formKey = GlobalKey<FormState>();
-
   late String email;
   late String password;
-  bool isInput = true; //false - result
-  bool isSignIn = true; //false - SingUp
+  bool isInput = true; // 로그인/회원가입 입력 화면 표시 여부
+  bool isSignIn = true; // 로그인 중인지, 회원가입 중인지 여부
 
   signIn() async {
     try {
@@ -205,7 +204,7 @@ class AuthWidgetState extends State<AuthWidget> {
         ),
       ),
       Padding(
-        padding: const EdgeInsets.only(top: 16.0), // 버튼 위에 여백 추가
+        padding: const EdgeInsets.only(top: 16.0),
         child: ElevatedButton(
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
@@ -218,7 +217,7 @@ class AuthWidgetState extends State<AuthWidget> {
         ),
       ),
       Padding(
-        padding: const EdgeInsets.only(top: 16.0), // 위쪽 마진 추가
+        padding: const EdgeInsets.only(top: 16.0),
         child: RichText(
           textAlign: TextAlign.right,
           text: TextSpan(
