@@ -53,37 +53,50 @@ class AuthWidgetState extends State<AuthWidget> {
   bool isInput = true; //false - result
   bool isSignIn = true; //false - SingUp
 
-  // login
   signIn() async {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) {
-        print(value);
         if (value.user!.emailVerified) {
-          // 로그인 성공 시, MainApp 화면으로 이동
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const items_app.MyApp()), // ItemsScreen으로 이동
+            MaterialPageRoute(builder: (context) => const items_app.MyApp()),
           );
-          showToast('환영합니다.');
         } else {
-          showToast('emailVerified error');
+          _showErrorDialog('이메일 인증이 필요합니다.');
         }
         return value;
       });
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-email') {
-        // 오류수정
-        showToast('user-not-found');
-      } else if (e.code == 'invalid-password') {
-        showToast('wrong-password');
-      } else {
-        print(e.code);
+      String errorMessage = '로그인 오류가 발생했습니다.';
+      if (e.code == 'invalid-login-credentials') {
+        errorMessage = '이메일 또는 비밀번호가 틀렸습니다.';
+      } else if (e.code == 'invalid-email') {
+        errorMessage = '유효하지 않은 이메일 형식입니다.';
+      } else if (e.code == 'too-many-requests') {
+        errorMessage = '너무 많은 요청이 감지되었습니다. 잠시 후 다시 시도해주세요.';
       }
+      _showErrorDialog(errorMessage);
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('오류'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('확인'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void signOut() async {
@@ -91,11 +104,6 @@ class AuthWidgetState extends State<AuthWidget> {
     setState(() => isInput = true);
   }
 
-  void logout() {
-    signOut();
-  }
-
-  // register
   signUp() async {
     try {
       await FirebaseAuth.instance
@@ -104,21 +112,42 @@ class AuthWidgetState extends State<AuthWidget> {
         if (value.user!.email != null) {
           FirebaseAuth.instance.currentUser?.sendEmailVerification();
           setState(() => isInput = false);
+          _showDialog('회원가입 성공!', '이메일 인증을 확인해주세요.');
         }
         return value;
       });
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showToast('weak-password');
+      String errorMessage = '회원가입 실패: ${e.message}';
+      if (e.code == 'invalid-email') {
+        errorMessage = '잘못된 이메일 형식입니다.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = '보안에 취약한 비밀번호입니다.';
       } else if (e.code == 'email-already-in-use') {
-        showToast('email-already-in-use');
-      } else {
-        showToast('other error');
-        print(e.code);
+        errorMessage = '이미 사용 중인 이메일입니다.';
       }
+      _showDialog('회원가입 실패', errorMessage);
     } catch (e) {
+      _showDialog('오류', '오류가 발생했습니다.');
       print(e.toString());
     }
+  }
+
+  void _showDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('확인'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   List<Widget> getInputWidget() {
