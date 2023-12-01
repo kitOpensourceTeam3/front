@@ -24,8 +24,7 @@ class MyApp extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<MyApp>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin {
   late TabController controller;
   List<NewTile> fridgeTiles = []; //아마 냉장실 리스트타일들 관리하는 리스트
 
@@ -44,22 +43,33 @@ class _HomeScreenState extends State<MyApp>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: true,
         home: Scaffold(
           appBar: AppBar(
             title: const Text('냉장고를 부탁해'),
             actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.refresh), //화면refresh. 추가 기능 구현 필요
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.search), //돋보기. 추가 기능 구현 필요
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.more_vert), // 추가기능 구현 필요
-                onPressed: () {},
+              PopupMenuButton<String>(
+                offset: const Offset(0, 40),
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    AuthWidget authWidget = AuthWidget();
+                    AuthWidgetState authWidgetState = authWidget.createState();
+                    authWidgetState.signOut();
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AuthWidget()),
+                    );
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return {'로그아웃'}.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: 'logout',
+                      child: Text(choice),
+                    );
+                  }).toList();
+                },
               ),
             ],
             bottom: TabBar(
@@ -78,8 +88,7 @@ class _HomeScreenState extends State<MyApp>
               // 냉장고 탭
               ListView(
                 children: <Widget>[
-                  NewTile(remainingDays: 'D-7', foodName: '식품 1'),
-                  NewTile(remainingDays: 'D-7', foodName: '식품 2')
+                  //NewTile(remainingDays: 'D-7', foodName: '식품 1')
                 ],
               ),
 
@@ -100,8 +109,7 @@ class _HomeScreenState extends State<MyApp>
                 // AddFoodScreen으로 화면 전환
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add),
@@ -148,8 +156,7 @@ class NewTile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const EditFoodScreen()),
+                  MaterialPageRoute(builder: (context) => const EditFoodScreen()),
                 );
               },
             ),
