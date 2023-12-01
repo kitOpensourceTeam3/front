@@ -44,22 +44,34 @@ class _HomeScreenState extends State<MyApp>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: true,
         home: Scaffold(
           appBar: AppBar(
             title: const Text('냉장고를 부탁해'),
             actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.refresh), //화면refresh. 추가 기능 구현 필요
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.search), //돋보기. 추가 기능 구현 필요
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.more_vert), // 추가기능 구현 필요
-                onPressed: () {},
+              PopupMenuButton<String>(
+                offset: const Offset(0, 40),
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    AuthWidget authWidget = AuthWidget();
+                    AuthWidgetState authWidgetState = authWidget.createState();
+                    authWidgetState.signOut();
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AuthWidget()),
+                    );
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return {'로그아웃'}.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: 'logout',
+                      child: Text(choice),
+                    );
+                  }).toList();
+                },
               ),
             ],
             bottom: TabBar(
@@ -77,20 +89,17 @@ class _HomeScreenState extends State<MyApp>
             children: <Widget>[
               // 냉장고 탭
               ListView(
-                children: <Widget>[
-                  NewTile(remainingDays: 'D-7', foodName: '식품 1'),
-                  NewTile(remainingDays: 'D-7', foodName: '식품 2')
-                ],
+                children: const <Widget>[],
               ),
 
               // 냉동실 탭
               ListView(
-                children: <Widget>[],
+                children: const <Widget>[],
               ),
 
               // 실온 탭
               ListView(
-                children: <Widget>[],
+                children: const <Widget>[],
               ),
             ],
           ),
@@ -136,7 +145,7 @@ class NewTile extends StatelessWidget {
           children: <Widget>[
             Text(
               remainingDays,
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
           ],
         ),
@@ -144,7 +153,7 @@ class NewTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             IconButton(
-              icon: Icon(Icons.edit),
+              icon: const Icon(Icons.edit),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -153,7 +162,7 @@ class NewTile extends StatelessWidget {
                 );
               },
             ),
-            IconButton(icon: Icon(Icons.delete), onPressed: onDelete),
+            IconButton(icon: const Icon(Icons.delete), onPressed: onDelete),
           ],
         ),
       ),
