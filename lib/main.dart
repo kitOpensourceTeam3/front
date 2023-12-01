@@ -64,9 +64,11 @@ class AuthWidgetState extends State<AuthWidget> {
           // 로그인 성공 시, MainApp 화면으로 이동
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const items_app.MyApp()), // ItemsScreen으로 이동
+            MaterialPageRoute(
+                builder: (context) =>
+                    const items_app.MyApp()), // ItemsScreen으로 이동
           );
-          showToast('login success');
+          showToast('환영합니다.');
         } else {
           showToast('emailVerified error');
         }
@@ -84,11 +86,6 @@ class AuthWidgetState extends State<AuthWidget> {
     }
   }
 
-  // logout
-  // signOut() async {
-  //   await FirebaseAuth.instance.signOut();
-  //   setState(() => isInput = true);
-  // }
   void signOut() async {
     await FirebaseAuth.instance.signOut();
     setState(() => isInput = true);
@@ -140,40 +137,47 @@ class AuthWidgetState extends State<AuthWidget> {
         key: _formKey,
         child: Column(
           children: [
-            TextFormField(
-              // <- email
-              decoration: const InputDecoration(labelText: 'email'),
-              validator: (value) {
-                if (value?.isEmpty ?? false) {
-                  return 'Please enter email';
-                }
-                return null;
-              },
-              onSaved: (String? value) {
-                email = value ?? "";
-              },
-            ),
-            TextFormField(
-              // <- password
-              decoration: const InputDecoration(
-                labelText: 'password',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                validator: (value) {
+                  if (value?.isEmpty ?? false) {
+                    return 'Please enter email';
+                  }
+                  return null;
+                },
+                onSaved: (value) => email = value ?? "",
               ),
-              obscureText: true,
-              validator: (value) {
-                if (value?.isEmpty ?? false) {
-                  return 'Please enter password';
-                }
-                return null;
-              },
-              onSaved: (String? value) {
-                password = value ?? "";
-              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value?.isEmpty ?? false) {
+                    return 'Please enter password';
+                  }
+                  return null;
+                },
+                onSaved: (value) => password = value ?? "",
+              ),
             ),
           ],
         ),
       ),
-      ElevatedButton(
-          // <- "SignIn" : "SignUp"
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0), // 버튼 위에 여백 추가
+        child: ElevatedButton(
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
               _formKey.currentState?.save();
@@ -181,28 +185,28 @@ class AuthWidgetState extends State<AuthWidget> {
               (isSignIn) ? signIn() : signUp();
             }
           },
-          child: Text(isSignIn ? "로그인" : "회원가입")),
-      RichText(
-        // go to SignUp or SignIn
-        textAlign: TextAlign.right,
-        text: TextSpan(
-          children: <TextSpan>[
-            TextSpan(
-                text: isSignIn ? "회원가입" : "로그인",
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    setState(() => isSignIn = !isSignIn);
-                  }),
-            TextSpan(
-              text: ' 하러가기',
-              style: Theme.of(context).textTheme.bodyLarge,
-            )
-          ],
+          child: Text(isSignIn ? "로그인" : "회원가입"),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0), // 위쪽 마진 추가
+        child: RichText(
+          textAlign: TextAlign.right,
+          text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                  text: isSignIn ? "계정이 없으신가요?" : "계정이 있으신가요?",
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      setState(() => isSignIn = !isSignIn);
+                    }),
+            ],
+          ),
         ),
       ),
     ];
@@ -238,7 +242,7 @@ class AuthWidgetState extends State<AuthWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Auth Test")),
+      appBar: AppBar(title: const Text("")),
       body: Column(
           // crossAxisAlignment: CrossAxisAlignment.stretch,
           children: isInput ? getInputWidget() : getResultWidget()),
