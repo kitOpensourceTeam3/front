@@ -64,9 +64,7 @@ class AuthWidgetState extends State<AuthWidget> {
           // 로그인 성공 시, MainApp 화면으로 이동
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const items_app.MyApp()), // ItemsScreen으로 이동
+            MaterialPageRoute(builder: (context) => const items_app.MyApp()), // ItemsScreen으로 이동
           );
           showToast('login success');
         } else {
@@ -87,9 +85,17 @@ class AuthWidgetState extends State<AuthWidget> {
   }
 
   // logout
-  signOut() async {
+  // signOut() async {
+  //   await FirebaseAuth.instance.signOut();
+  //   setState(() => isInput = true);
+  // }
+  void signOut() async {
     await FirebaseAuth.instance.signOut();
     setState(() => isInput = true);
+  }
+
+  void logout() {
+    signOut();
   }
 
   // register
