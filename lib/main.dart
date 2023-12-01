@@ -53,44 +53,57 @@ class AuthWidgetState extends State<AuthWidget> {
   bool isInput = true; //false - result
   bool isSignIn = true; //false - SingUp
 
-  // login
   signIn() async {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) {
-        print(value);
         if (value.user!.emailVerified) {
-          // 로그인 성공 시, MainApp 화면으로 이동
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const items_app.MyApp()), // ItemsScreen으로 이동
+            MaterialPageRoute(builder: (context) => const items_app.MyApp()),
           );
-          showToast('login success');
         } else {
-          showToast('emailVerified error');
+          _showErrorDialog('이메일 인증이 필요합니다.');
         }
         return value;
       });
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-email') {
-        // 오류수정
-        showToast('user-not-found');
-      } else if (e.code == 'invalid-password') {
-        showToast('wrong-password');
-      } else {
-        print(e.code);
+      String errorMessage = '로그인 오류가 발생했습니다.';
+      if (e.code == 'invalid-login-credentials') {
+        errorMessage = '이메일 또는 비밀번호가 틀렸습니다.';
+      } else if (e.code == 'invalid-email') {
+        errorMessage = '유효하지 않은 이메일 형식입니다.';
+      } else if (e.code == 'too-many-requests') {
+        errorMessage = '너무 많은 요청이 감지되었습니다. 잠시 후 다시 시도해주세요.';
       }
+      _showErrorDialog(errorMessage);
     }
   }
 
-  // logout
-  signOut() async {
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('오류'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('확인'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void signOut() async {
     await FirebaseAuth.instance.signOut();
     setState(() => isInput = true);
   }
 
-  // register
   signUp() async {
     try {
       await FirebaseAuth.instance
@@ -99,21 +112,42 @@ class AuthWidgetState extends State<AuthWidget> {
         if (value.user!.email != null) {
           FirebaseAuth.instance.currentUser?.sendEmailVerification();
           setState(() => isInput = false);
+          _showDialog('회원가입 성공!', '이메일 인증을 확인해주세요.');
         }
         return value;
       });
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showToast('weak-password');
+      String errorMessage = '회원가입 실패: ${e.message}';
+      if (e.code == 'invalid-email') {
+        errorMessage = '잘못된 이메일 형식입니다.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = '보안에 취약한 비밀번호입니다.';
       } else if (e.code == 'email-already-in-use') {
-        showToast('email-already-in-use');
-      } else {
-        showToast('other error');
-        print(e.code);
+        errorMessage = '이미 사용 중인 이메일입니다.';
       }
+      _showDialog('회원가입 실패', errorMessage);
     } catch (e) {
+      _showDialog('오류', '오류가 발생했습니다.');
       print(e.toString());
     }
+  }
+
+  void _showDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('확인'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   List<Widget> getInputWidget() {
@@ -132,40 +166,47 @@ class AuthWidgetState extends State<AuthWidget> {
         key: _formKey,
         child: Column(
           children: [
-            TextFormField(
-              // <- email
-              decoration: const InputDecoration(labelText: 'email'),
-              validator: (value) {
-                if (value?.isEmpty ?? false) {
-                  return 'Please enter email';
-                }
-                return null;
-              },
-              onSaved: (String? value) {
-                email = value ?? "";
-              },
-            ),
-            TextFormField(
-              // <- password
-              decoration: const InputDecoration(
-                labelText: 'password',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                validator: (value) {
+                  if (value?.isEmpty ?? false) {
+                    return 'Please enter email';
+                  }
+                  return null;
+                },
+                onSaved: (value) => email = value ?? "",
               ),
-              obscureText: true,
-              validator: (value) {
-                if (value?.isEmpty ?? false) {
-                  return 'Please enter password';
-                }
-                return null;
-              },
-              onSaved: (String? value) {
-                password = value ?? "";
-              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value?.isEmpty ?? false) {
+                    return 'Please enter password';
+                  }
+                  return null;
+                },
+                onSaved: (value) => password = value ?? "",
+              ),
             ),
           ],
         ),
       ),
-      ElevatedButton(
-          // <- "SignIn" : "SignUp"
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0), // 버튼 위에 여백 추가
+        child: ElevatedButton(
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
               _formKey.currentState?.save();
@@ -173,28 +214,28 @@ class AuthWidgetState extends State<AuthWidget> {
               (isSignIn) ? signIn() : signUp();
             }
           },
-          child: Text(isSignIn ? "로그인" : "회원가입")),
-      RichText(
-        // go to SignUp or SignIn
-        textAlign: TextAlign.right,
-        text: TextSpan(
-          children: <TextSpan>[
-            TextSpan(
-                text: isSignIn ? "회원가입" : "로그인",
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    setState(() => isSignIn = !isSignIn);
-                  }),
-            TextSpan(
-              text: ' 하러가기',
-              style: Theme.of(context).textTheme.bodyLarge,
-            )
-          ],
+          child: Text(isSignIn ? "로그인" : "회원가입"),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0), // 위쪽 마진 추가
+        child: RichText(
+          textAlign: TextAlign.right,
+          text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                  text: isSignIn ? "계정이 없으신가요?" : "계정이 있으신가요?",
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      setState(() => isSignIn = !isSignIn);
+                    }),
+            ],
+          ),
         ),
       ),
     ];
@@ -230,7 +271,7 @@ class AuthWidgetState extends State<AuthWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Auth Test")),
+      appBar: AppBar(title: const Text("")),
       body: Column(
           // crossAxisAlignment: CrossAxisAlignment.stretch,
           children: isInput ? getInputWidget() : getResultWidget()),
