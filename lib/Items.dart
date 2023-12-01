@@ -57,7 +57,7 @@ class _HomeScreenState extends State<MyApp>
                     AuthWidgetState authWidgetState = authWidget.createState();
                     authWidgetState.signOut();
 
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) => const AuthWidget()),
@@ -89,19 +89,17 @@ class _HomeScreenState extends State<MyApp>
             children: <Widget>[
               // 냉장고 탭
               ListView(
-                children: <Widget>[
-                  //NewTile(remainingDays: 'D-7', foodName: '식품 1')
-                ],
+                children: const <Widget>[],
               ),
 
               // 냉동실 탭
               ListView(
-                children: <Widget>[],
+                children: const <Widget>[],
               ),
 
               // 실온 탭
               ListView(
-                children: <Widget>[],
+                children: const <Widget>[],
               ),
             ],
           ),
@@ -147,7 +145,7 @@ class NewTile extends StatelessWidget {
           children: <Widget>[
             Text(
               remainingDays,
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
           ],
         ),
@@ -155,7 +153,7 @@ class NewTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             IconButton(
-              icon: Icon(Icons.edit),
+              icon: const Icon(Icons.edit),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -164,7 +162,7 @@ class NewTile extends StatelessWidget {
                 );
               },
             ),
-            IconButton(icon: Icon(Icons.delete), onPressed: onDelete),
+            IconButton(icon: const Icon(Icons.delete), onPressed: onDelete),
           ],
         ),
       ),
