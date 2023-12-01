@@ -61,6 +61,7 @@ class AuthWidgetState extends State<AuthWidget> {
         if (value.user!.emailVerified) {
           Navigator.pushReplacement(
             context,
+
             MaterialPageRoute(builder: (context) => const items_app.MyApp()),
           );
         } else {
