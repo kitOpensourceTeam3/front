@@ -254,7 +254,7 @@ class AuthWidgetState extends State<AuthWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String imagePath = 'images/Logo/Logo.png'; // 이미지 경로 정의
+    String imagePath = 'images/Logo/AppLogo.png'; // 이미지 경로 정의
 
     return Scaffold(
       appBar: AppBar(
