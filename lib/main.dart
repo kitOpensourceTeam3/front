@@ -1,11 +1,11 @@
-// ignore_for_file: avoid_print, unused_import
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../firebase_options.dart';
 import 'package:flutter_application/Items.dart' as items_app;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '냉장고를 부탁해',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const AuthWidget(),
     );
@@ -34,42 +34,21 @@ class AuthWidget extends StatefulWidget {
 
 class AuthWidgetState extends State<AuthWidget> {
   final _formKey = GlobalKey<FormState>();
+
   late String email;
   late String password;
-  bool isInput = true; // 로그인/회원가입 입력 화면 표시 여부
-  bool isSignIn = true; // 로그인 중인지, 회원가입 중인지 여부
-  bool autoLogin = false; // 자동 로그인 여부
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAutoLogin();
-  }
-
-  void _checkAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedEmail = prefs.getString('email');
-    final savedPassword = prefs.getString('password');
-
-    if (savedEmail != null && savedPassword != null) {
-      email = savedEmail;
-      password = savedPassword;
-      signIn();
-    }
-  }
+  bool isInput = true; //false - result
+  bool isSignIn = true; //false - SingUp
+  bool isLoading = false; // 로딩 상태 변수 추가
 
   signIn() async {
     try {
+      setState(() => isLoading = true); // 로딩 시작
+
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((value) async {
+          .then((value) {
         if (value.user!.emailVerified) {
-          if (autoLogin) {
-            final prefs = await SharedPreferences.getInstance();
-            prefs.setString('email', email);
-            prefs.setString('password', password);
-          }
-          // ignore: use_build_context_synchronously
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const items_app.MyApp()),
@@ -89,6 +68,8 @@ class AuthWidgetState extends State<AuthWidget> {
         errorMessage = '너무 많은 요청이 감지되었습니다. 잠시 후 다시 시도해주세요.';
       }
       _showErrorDialog(errorMessage);
+    } finally {
+      setState(() => isLoading = false); // 로딩 종료
     }
   }
 
@@ -112,9 +93,6 @@ class AuthWidgetState extends State<AuthWidget> {
 
   void signOut() async {
     await FirebaseAuth.instance.signOut();
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove('email');
-    prefs.remove('password');
     setState(() => isInput = true);
   }
 
@@ -167,6 +145,7 @@ class AuthWidgetState extends State<AuthWidget> {
   List<Widget> getInputWidget() {
     return [
       Text(
+        // title
         isSignIn ? "로그인" : "회원가입",
         style: const TextStyle(
           color: Colors.indigo,
@@ -214,53 +193,41 @@ class AuthWidgetState extends State<AuthWidget> {
                 onSaved: (value) => password = value ?? "",
               ),
             ),
-            if (isSignIn)
-              SwitchListTile(
-                title: const Text('자동 로그인'),
-                value: autoLogin,
-                onChanged: (bool value) {
-                  setState(() {
-                    autoLogin = value;
-                  });
-                },
-              ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    _formKey.currentState?.save();
-                    (isSignIn) ? signIn() : signUp();
-                  }
-                },
-                child: Text(isSignIn ? "로그인" : "회원가입"),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: RichText(
-                textAlign: TextAlign.right,
-                text: TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                        text: isSignIn ? "계정이 없으신가요?" : "계정이 있으신가요?",
-                        style: const TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            setState(() {
-                              isSignIn = !isSignIn;
-                              autoLogin = false;
-                            });
-                          }),
-                  ],
-                ),
-              ),
-            ),
           ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState?.validate() ?? false) {
+              _formKey.currentState?.save();
+              print('email: $email, password : $password');
+              (isSignIn) ? signIn() : signUp();
+            }
+          },
+          child: Text(isSignIn ? "로그인" : "회원가입"),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: RichText(
+          textAlign: TextAlign.right,
+          text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                  text: isSignIn ? "계정이 없으신가요?" : "계정이 있으신가요?",
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      setState(() => isSignIn = !isSignIn);
+                    }),
+            ],
+          ),
         ),
       ),
     ];
@@ -298,8 +265,18 @@ class AuthWidgetState extends State<AuthWidget> {
     return Scaffold(
       appBar: AppBar(title: const Text("")),
       body: Column(
-          // crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: isInput ? getInputWidget() : getResultWidget()),
+        children: <Widget>[
+          if (isLoading) // 로딩 중이면 스피너를 표시
+            const Center(
+              child: SpinKitThreeInOut(
+                color: Colors.blue,
+                size: 50.0,
+              ),
+            ),
+          if (!isLoading) // 로딩 중이 아니면 화면 표시
+            ...(isInput ? getInputWidget() : getResultWidget()),
+        ],
+      ),
     );
   }
 }
