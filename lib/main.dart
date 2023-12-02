@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -10,7 +11,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -144,16 +145,6 @@ class AuthWidgetState extends State<AuthWidget> {
 
   List<Widget> getInputWidget() {
     return [
-      Text(
-        // title
-        isSignIn ? "로그인" : "회원가입",
-        style: const TextStyle(
-          color: Colors.indigo,
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-        ),
-        textAlign: TextAlign.center,
-      ),
       Form(
         key: _formKey,
         child: Column(
@@ -262,19 +253,50 @@ class AuthWidgetState extends State<AuthWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String imagePath = 'images/Logo/Logo.png'; // 이미지 경로 정의
+
     return Scaffold(
-      appBar: AppBar(title: const Text("")),
+      appBar: AppBar(
+        title: Text(
+          isSignIn ? "로그인" : "회원가입",
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: Column(
-        children: <Widget>[
-          if (isLoading) // 로딩 중이면 스피너를 표시
-            const Center(
-              child: SpinKitThreeInOut(
-                color: Colors.blue,
-                size: 50.0,
+        children: [
+          SizedBox(
+            child: Padding(
+              padding: const EdgeInsets.all(1.0), // 이미지 주변의 여백을 설정
+              child: Image.asset(imagePath,
+                  fit: BoxFit.cover, // 이미지를 적절하게 조정
+                  width: 200, // 이미지의 너비 설정 (원하는 크기로 조정)
+                  height: 200),
+            ),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment(0, -1),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    if (isLoading)
+                      const SpinKitThreeInOut(
+                        color: Colors.blue,
+                        size: 50.0,
+                      ),
+                    if (!isLoading) ...(isInput ? getInputWidget() : getResultWidget()),
+                  ],
+                ),
               ),
             ),
-          if (!isLoading) // 로딩 중이 아니면 화면 표시
-            ...(isInput ? getInputWidget() : getResultWidget()),
+          ),
         ],
       ),
     );
