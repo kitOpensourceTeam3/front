@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, library_private_types_in_public_api
 //edit food
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -34,7 +34,7 @@ class _EditFoodScreenState extends State<EditFoodScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete), // 휴지통 아이콘을 사용하거나 다른 아이콘을 선택할 수 있습니다.
+            icon: const Icon(Icons.delete), // 휴지통 아이콘을 사용하거나 다른 아이콘을 선택할 수 있습니다.
             onPressed: () {
               // 휴지통 아이콘을 누르면 실행될 함수를 여기에 추가하세요.
             },

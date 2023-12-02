@@ -1,32 +1,30 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class AddFoodScreen extends StatefulWidget {
-  const AddFoodScreen({Key? key}) : super(key: key);
+class AddFoodScreen extends StatelessWidget {
+  final int food_Id;
 
-  @override
-  _AddFoodScreenState createState() => _AddFoodScreenState();
-}
+  const AddFoodScreen({super.key, required this.food_Id});
 
-class _AddFoodScreenState extends State<AddFoodScreen> {
-  String imagePath = 'images/cooking/salad.png';
-  String selectedStorage = '냉장고';
-  final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
-  int quantity = 1;
-  DateTime selectedDate = DateTime.now();
-  DateTime? expirationDate;
-  TextEditingController noteController = TextEditingController();
+  get boldStyle => const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  get hintStyle => const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
 
-  final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
-  final InputBorder borderStyle =
-      const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
-  final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
+  get borderStyle => const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
+
+  get paddingSymmetric10 => const EdgeInsets.symmetric(horizontal: 10);
 
   @override
   Widget build(BuildContext context) {
+    String imagePath = 'images/cooking/salad.png';
+    String selectedStorage = '냉장고';
+    final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
+    int quantity = 1;
+    DateTime selectedDate = DateTime.now();
+    DateTime? expirationDate;
+    TextEditingController noteController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('식품 추가하기', style: TextStyle(color: Colors.black)),
@@ -37,14 +35,22 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            buildImageSection(),
-            buildNameSection(),
-            buildStorageSection(),
-            buildQuantitySection(),
+            buildImageSection(imagePath),
+            buildNameSection(imagePath),
+            buildStorageSection(selectedStorage, storageOptions),
+            buildQuantitySection(quantity),
             buildDivider(),
-            buildDateSection('등록일', selectedDate),
-            buildDateSection('소비기한', expirationDate),
-            buildNoteSection(),
+            buildDateSection('등록일', selectedDate, () {
+              _selectDate(context, selectedDate, (picked) {
+                selectedDate = picked;
+              });
+            }),
+            buildDateSection('소비기한', expirationDate, () {
+              _selectDate(context, expirationDate ?? DateTime.now(), (picked) {
+                expirationDate = picked;
+              });
+            }),
+            buildNoteSection(noteController),
             buildAddButton(),
           ],
         ),
@@ -52,7 +58,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     );
   }
 
-  Positioned buildImageSection() {
+  Positioned buildImageSection(String imagePath) {
     return Positioned(
       top: 50,
       left: 50,
@@ -71,7 +77,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     );
   }
 
-  Positioned buildNameSection() {
+  Positioned buildNameSection(String imagePath) {
     String imageName = imagePath.split('/').last.split('.').first;
     return Positioned(
       top: 80,
@@ -97,7 +103,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     );
   }
 
-  Positioned buildStorageSection() {
+  Positioned buildStorageSection(String selectedStorage, List<String> storageOptions) {
     return Positioned(
       top: 160,
       left: 50,
@@ -109,9 +115,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
           DropdownButton<String>(
             value: selectedStorage,
             onChanged: (String? newValue) {
-              setState(() {
-                selectedStorage = newValue!;
-              });
+              // Note: Since this is a StatelessWidget, there is no `setState` method
             },
             items: storageOptions.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
@@ -125,7 +129,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     );
   }
 
-  Positioned buildQuantitySection() {
+  Positioned buildQuantitySection(int quantity) {
     return Positioned(
       top: 200,
       left: 50,
@@ -139,20 +143,14 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
               IconButton(
                 icon: const Icon(Icons.remove),
                 onPressed: () {
-                  setState(() {
-                    if (quantity > 1) {
-                      quantity--;
-                    }
-                  });
+                  // Note: Since this is a StatelessWidget, there is no `setState` method
                 },
               ),
               Text('$quantity', style: const TextStyle(fontSize: 16)),
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
-                  setState(() {
-                    quantity++;
-                  });
+                  // Note: Since this is a StatelessWidget, there is no `setState` method
                 },
               ),
             ],
@@ -171,7 +169,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     );
   }
 
-  Positioned buildDateSection(String title, DateTime? date) {
+  Positioned buildDateSection(String title, DateTime? date, Function() onPressed) {
     return Positioned(
       top: title == '등록일' ? 260 : 300,
       left: 50,
@@ -181,23 +179,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         children: [
           Text(title, style: boldStyle),
           TextButton(
-            onPressed: () async {
-              final DateTime? picked = await showDatePicker(
-                context: context,
-                initialDate: date ?? DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2101),
-              );
-              if (picked != null && picked != date) {
-                setState(() {
-                  if (title == '등록일') {
-                    selectedDate = picked;
-                  } else {
-                    expirationDate = picked;
-                  }
-                });
-              }
-            },
+            onPressed: onPressed,
             child: Text(
               date == null ? '날짜 선택' : DateFormat('yyyy-MM-dd').format(date),
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
@@ -208,7 +190,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     );
   }
 
-  Positioned buildNoteSection() {
+  Positioned buildNoteSection(TextEditingController noteController) {
     return Positioned(
       top: 400,
       left: 50,
@@ -241,7 +223,9 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       left: 50,
       right: 50,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          // Note: Since this is a StatelessWidget, there is no `setState` method
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
           padding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -253,5 +237,18 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         child: const Text('추가'),
       ),
     );
+  }
+
+  Future<void> _selectDate(
+      BuildContext context, DateTime initialDate, Function(DateTime) onDateSelected) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != initialDate) {
+      onDateSelected(picked);
+    }
   }
 }
