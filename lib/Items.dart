@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unused_import
+// ignore_for_file: library_private_types_in_public_api, unused_import, file_names
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/Edit_Food.dart';
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
                 offset: const Offset(0, 40),
                 onSelected: (value) {
                   if (value == 'logout') {
-                    AuthWidget authWidget = AuthWidget();
+                    AuthWidget authWidget = const AuthWidget();
                     AuthWidgetState authWidgetState = authWidget.createState();
                     authWidgetState.signOut();
 
@@ -123,7 +123,8 @@ class NewTile extends StatelessWidget {
   final Function()? onEdit;
   final Function()? onDelete;
 
-  NewTile({
+  const NewTile({
+    super.key,
     required this.remainingDays,
     required this.foodName,
     this.onEdit,
