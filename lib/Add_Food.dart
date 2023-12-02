@@ -1,7 +1,6 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddFoodScreen extends StatelessWidget {
   final int food_Id;
@@ -17,48 +16,70 @@ class AddFoodScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String imagePath = 'images/cooking/salad.png';
-    String selectedStorage = '냉장고';
-    final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
-    int quantity = 1;
-    DateTime selectedDate = DateTime.now();
-    DateTime? expirationDate;
-    TextEditingController noteController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('식품 추가하기', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            buildImageSection(imagePath),
-            buildNameSection(imagePath),
-            buildStorageSection(selectedStorage, storageOptions),
-            buildQuantitySection(quantity),
-            buildDivider(),
-            buildDateSection('등록일', selectedDate, () {
-              _selectDate(context, selectedDate, (picked) {
-                selectedDate = picked;
-              });
-            }),
-            buildDateSection('소비기한', expirationDate, () {
-              _selectDate(context, expirationDate ?? DateTime.now(), (picked) {
-                expirationDate = picked;
-              });
-            }),
-            buildNoteSection(noteController),
-            buildAddButton(),
-          ],
-        ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('food_list')
+            .where('id', isEqualTo: food_Id)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Text('오류가 발생했습니다.');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+
+          var foodData = snapshot.data!.docs.first;
+          if (!snapshot.hasData) {
+            return const Text('데이터가 없습니다.');
+          }
+
+          int imagePath = foodData['img_id'];
+          String namePath = foodData['name'];
+          String selectedStorage = '냉장고';
+          final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
+          int quantity = 1;
+          DateTime selectedDate = DateTime.now();
+          DateTime expirationDate = selectedDate.add(Duration(days: foodData['exp_date']));
+          TextEditingController noteController = TextEditingController();
+
+          return Center(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                buildImageSection(imagePath),
+                buildNameSection(namePath),
+                buildStorageSection(selectedStorage),
+                buildQuantitySection(quantity),
+                buildDivider(),
+                buildDateSection('등록일', selectedDate, () {
+                  _selectDate(context, selectedDate, (picked) {
+                    // Update the picked date to Firestore if needed
+                  });
+                }),
+                buildDateSection('소비기한', expirationDate, () {
+                  _selectDate(context, expirationDate, (picked) {
+                    // Update the picked date to Firestore if needed
+                  });
+                }),
+                buildNoteSection(noteController),
+                buildAddButton(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 
-  Positioned buildImageSection(String imagePath) {
+  Positioned buildImageSection(int imagePath) {
     return Positioned(
       top: 50,
       left: 50,
@@ -68,10 +89,34 @@ class AddFoodScreen extends StatelessWidget {
           color: const Color.fromRGBO(230, 230, 230, 1),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Image.asset(
-          imagePath,
-          width: 100,
-          fit: BoxFit.cover,
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('food_image')
+              .where('id', isEqualTo: imagePath)
+              .snapshots(),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text("Error: ${snapshot.error}");
+            }
+
+            if (snapshot.connectionState == ConnectionState.active) {
+              var imageData = snapshot.data!.docs;
+
+              if (imageData.isNotEmpty) {
+                String imagePath = imageData.first['f_name'] as String;
+
+                return Image.network(
+                  imagePath,
+                  width: 100,
+                  fit: BoxFit.cover,
+                );
+              } else {
+                return const Text("No data found"); // Handle the case when no data is available
+              }
+            }
+
+            return const CircularProgressIndicator(); // While data is being fetched
+          },
         ),
       ),
     );
@@ -103,7 +148,7 @@ class AddFoodScreen extends StatelessWidget {
     );
   }
 
-  Positioned buildStorageSection(String selectedStorage, List<String> storageOptions) {
+  Positioned buildStorageSection(String selectedStorage) {
     return Positioned(
       top: 160,
       left: 50,
@@ -112,18 +157,7 @@ class AddFoodScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('보관장소', style: boldStyle),
-          DropdownButton<String>(
-            value: selectedStorage,
-            onChanged: (String? newValue) {
-              // Note: Since this is a StatelessWidget, there is no `setState` method
-            },
-            items: storageOptions.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
+          Text(selectedStorage),
         ],
       ),
     );
@@ -138,23 +172,7 @@ class AddFoodScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('수량', style: boldStyle),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove),
-                onPressed: () {
-                  // Note: Since this is a StatelessWidget, there is no `setState` method
-                },
-              ),
-              Text('$quantity', style: const TextStyle(fontSize: 16)),
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  // Note: Since this is a StatelessWidget, there is no `setState` method
-                },
-              ),
-            ],
-          ),
+          Text('$quantity'),
         ],
       ),
     );
@@ -169,7 +187,7 @@ class AddFoodScreen extends StatelessWidget {
     );
   }
 
-  Positioned buildDateSection(String title, DateTime? date, Function() onPressed) {
+  Positioned buildDateSection(String title, DateTime date, VoidCallback onPressed) {
     return Positioned(
       top: title == '등록일' ? 260 : 300,
       left: 50,
@@ -181,7 +199,7 @@ class AddFoodScreen extends StatelessWidget {
           TextButton(
             onPressed: onPressed,
             child: Text(
-              date == null ? '날짜 선택' : DateFormat('yyyy-MM-dd').format(date),
+              DateFormat('yyyy-MM-dd').format(date),
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
             ),
           ),
@@ -224,7 +242,7 @@ class AddFoodScreen extends StatelessWidget {
       right: 50,
       child: ElevatedButton(
         onPressed: () {
-          // Note: Since this is a StatelessWidget, there is no `setState` method
+          // Update data to Firestore if needed
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
