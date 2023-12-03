@@ -12,13 +12,29 @@ class AddFirestoreData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<void> createNewFoodData(String uid) async {
+      String storageType;
+      switch (foodData.selectedStorage) {
+        case '냉장고':
+          storageType = 'cool';
+          break;
+        case '냉동고':
+          storageType = 'frozen';
+          break;
+        case '상온':
+          storageType = 'room';
+          break;
+        default:
+          storageType = 'unknown';
+          break;
+      }
+
       Map<String, dynamic> jsonData = {
         'uid': uid,
         'f_id': foodId,
         'quantity': foodData.quantity,
         'add_day': Timestamp.fromDate(foodData.selectedDate),
         'exp_day': Timestamp.fromDate(foodData.expirationDate),
-        'type': foodData.selectedStorage,
+        'type': storageType,
         'memo': foodData.noteController.text,
       };
 
