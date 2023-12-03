@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application/add_food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,7 +43,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
 
                 return GridView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 5,
                     childAspectRatio: 1.0,
@@ -95,7 +97,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
 
                   return GridView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 5,
                       childAspectRatio: 1.0,
