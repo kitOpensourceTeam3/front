@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application/add_food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +12,11 @@ class FoodListScreen extends StatefulWidget {
 
 class _FoodListScreenState extends State<FoodListScreen> {
   int? selectedFoodTypeId;
+
+  Future<String> _getImageLink(String imgId) async {
+    var document = await FirebaseFirestore.instance.collection('food_image').doc(imgId).get();
+    return document.data()?['f_name'] ?? ''; // 이미지 링크 반환, 없으면 빈 문자열 반환
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,27 +51,65 @@ class _FoodListScreenState extends State<FoodListScreen> {
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 5,
                     childAspectRatio: 1.0,
-                    mainAxisSpacing: 4, // 세로 여백 조정
+                    mainAxisSpacing: 4,
                   ),
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     var foodType = snapshot.data!.docs[index];
-                    return InkWell(
-                      onTap: () {
-                        setState(() {
-                          selectedFoodTypeId = foodType['id'];
-                        });
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          margin: const EdgeInsets.all(8),
-                          color: Colors.blue,
-                          child: Center(
-                            child: Text(foodType['name']), // name 필드의 데이터 표시
+                    String imgId = foodType['img_id'].toString();
+
+                    return FutureBuilder<String>(
+                      future: _getImageLink(imgId),
+                      builder: (context, imageSnapshot) {
+                        if (imageSnapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+                        if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
+                          return const Icon(Icons.error);
+                        }
+
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedFoodTypeId = foodType['id'];
+                            });
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              margin: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Image.network(
+                                      imageSnapshot.data!,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(bottom: 2.0),
+                                    child: Text(
+                                      foodType['name'],
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
                 );
@@ -102,28 +143,66 @@ class _FoodListScreenState extends State<FoodListScreen> {
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 5,
                       childAspectRatio: 1.0,
-                      mainAxisSpacing: 4, // 세로 여백 조정
+                      mainAxisSpacing: 4,
                     ),
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       var moreFoodData = snapshot.data!.docs[index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddFoodScreen(foodId: moreFoodData['id']),
+                      String imgId = moreFoodData['img_id'].toString();
+
+                      return FutureBuilder<String>(
+                        future: _getImageLink(imgId),
+                        builder: (context, imageSnapshot) {
+                          if (imageSnapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+                          if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
+                            return const Icon(Icons.error);
+                          }
+
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddFoodScreen(foodId: moreFoodData['id']),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              margin: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.green,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Image.network(
+                                      imageSnapshot.data!,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(bottom: 2.0),
+                                    child: Text(
+                                      moreFoodData['name'],
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          margin: const EdgeInsets.all(8),
-                          color: Colors.green,
-                          child: Center(
-                            child: Text(moreFoodData['name']),
-                          ),
-                        ),
                       );
                     },
                   );
