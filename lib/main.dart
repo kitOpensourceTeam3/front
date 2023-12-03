@@ -286,11 +286,7 @@ class AuthWidgetState extends State<AuthWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    if (isLoading)
-                      const SpinKitThreeInOut(
-                        color: Colors.blue,
-                        size: 50.0,
-                      ),
+                    if (isLoading) const LoadingIndicator(),
                     if (!isLoading) ...(isInput ? getInputWidget() : getResultWidget()),
                   ],
                 ),
@@ -299,6 +295,25 @@ class AuthWidgetState extends State<AuthWidget> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class LoadingIndicator extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const LoadingIndicator({
+    Key? key,
+    this.size = 50.0,
+    this.color = Colors.blue,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SpinKitThreeInOut(
+      color: color,
+      size: size,
     );
   }
 }
