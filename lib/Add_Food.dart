@@ -3,11 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application/data_class.dart';
+import 'package:flutter_application/food_data_stream_builder.dart';
 
 class AddFoodScreen extends StatefulWidget {
   final int food_Id;
 
-  const AddFoodScreen({super.key, required this.food_Id});
+  const AddFoodScreen({Key? key, required this.food_Id}) : super(key: key);
 
   @override
   _AddFoodScreenState createState() => _AddFoodScreenState();
@@ -22,6 +24,8 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
   final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
 
+  late FoodData foodData;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,53 +34,35 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('food_list')
-            .where('id', isEqualTo: widget.food_Id)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Text('오류가 발생했습니다.');
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-
-          var foodData = snapshot.data!.docs.first;
-          if (!snapshot.hasData) {
-            return const Text('데이터가 없습니다.');
-          }
-
-          int imagePath = foodData['img_id'];
-          String namePath = foodData['name'];
-          String selectedStorage = '냉장고';
-          int quantity = 1;
-          DateTime selectedDate = DateTime.now();
-          DateTime expirationDate = selectedDate.add(Duration(days: foodData['exp_date']));
-          TextEditingController noteController = TextEditingController();
+      body: FoodDataStreamBuilder(
+        foodId: widget.food_Id,
+        builder: (foodData) {
+          this.foodData = foodData;
 
           return Center(
             child: Stack(
               alignment: Alignment.center,
               children: [
-                buildImageSection(imagePath),
-                buildNameSection(namePath),
-                buildStorageSection(selectedStorage),
-                buildQuantitySection(quantity),
+                buildImageSection(foodData.imagePath),
+                buildNameSection(foodData.namePath),
+                buildStorageSection(foodData.selectedStorage),
+                buildQuantitySection(foodData.quantity),
                 buildDivider(),
-                buildDateSection('등록일', selectedDate, () {
-                  _selectDate(context, selectedDate, (picked) {
-                    // Update the picked date to Firestore if needed
+                buildDateSection('등록일', foodData.selectedDate, () {
+                  _selectDate(context, foodData.selectedDate, (picked) {
+                    setState(() {
+                      foodData.selectedDate = picked;
+                    });
                   });
                 }),
-                buildDateSection('소비기한', expirationDate, () {
-                  _selectDate(context, expirationDate, (picked) {
-                    // Update the picked date to Firestore if needed
+                buildDateSection('소비기한', foodData.expirationDate, () {
+                  _selectDate(context, foodData.expirationDate, (picked) {
+                    setState(() {
+                      foodData.expirationDate = picked;
+                    });
                   });
                 }),
-                buildNoteSection(noteController),
+                buildNoteSection(foodData.noteController),
                 buildAddButton(),
               ],
             ),
@@ -112,17 +98,13 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
               if (imageData.isNotEmpty) {
                 String imagePath = imageData.first['f_name'] as String;
 
-                return Image.network(
-                  imagePath,
-                  width: 100,
-                  fit: BoxFit.cover,
-                );
+                return Image.network(imagePath, height: 90, width: 100);
               } else {
-                return const Text("No data found"); // Handle the case when no data is available
+                return const Text("No data found");
               }
             }
 
-            return const CircularProgressIndicator(); // While data is being fetched
+            return const CircularProgressIndicator();
           },
         ),
       ),
@@ -164,10 +146,10 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         children: [
           Text('보관장소', style: boldStyle),
           DropdownButton<String>(
-            value: selectedStorage,
+            value: foodData.selectedStorage,
             onChanged: (String? newValue) {
               setState(() {
-                selectedStorage = newValue!;
+                foodData.selectedStorage = newValue!;
               });
             },
             items: storageOptions.map<DropdownMenuItem<String>>((String value) {
@@ -197,18 +179,18 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                 icon: const Icon(Icons.remove),
                 onPressed: () {
                   setState(() {
-                    if (quantity > 1) {
-                      quantity--;
+                    if (foodData.quantity > 1) {
+                      foodData.quantity--;
                     }
                   });
                 },
               ),
-              Text('$quantity', style: const TextStyle(fontSize: 16)),
+              Text('${foodData.quantity}', style: const TextStyle(fontSize: 16)),
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
                   setState(() {
-                    quantity++;
+                    foodData.quantity++;
                   });
                 },
               ),
@@ -262,7 +244,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
           borderRadius: BorderRadius.circular(5),
         ),
         child: TextField(
-          controller: noteController,
+          controller: foodData.noteController,
           maxLines: null,
           keyboardType: TextInputType.multiline,
           decoration: const InputDecoration(
@@ -282,7 +264,10 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       left: 50,
       right: 50,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          // 여기에 Firestore에 데이터 추가하는 로직 추가
+          // foodData를 이용하여 필요한 데이터를 Firestore에 저장
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
           padding: const EdgeInsets.symmetric(vertical: 15.0),

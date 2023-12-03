@@ -1,8 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api, unused_import, file_names
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application/Edit_Food.dart';
-import 'package:flutter_application/Add_Food.dart';
+import 'package:flutter_application/edit_food.dart';
+import 'package:flutter_application/add_food.dart';
 import 'package:flutter_application/food_list.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
