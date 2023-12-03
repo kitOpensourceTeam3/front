@@ -4,6 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class food_data {
+  int imagePath;
+  String namePath;
+  String selectedStorage = '냉장고';
+  int quantity = 1;
+  DateTime selectedDate = DateTime.now();
+  DateTime expirationDate;
+  TextEditingController noteController = TextEditingController();
+
+  food_data({required this.imagePath, required this.namePath, required this.expirationDate});
+}
+
 class AddFoodScreen extends StatefulWidget {
   final int food_Id;
 
