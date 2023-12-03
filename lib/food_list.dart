@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/Add_Food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_application/main.dart' as main;
 
 class FoodListScreen extends StatelessWidget {
   const FoodListScreen({super.key});
@@ -27,7 +29,7 @@ class FoodListScreen extends StatelessWidget {
             return const Text('오류가 발생했습니다.');
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const main.LoadingIndicator();
           }
 
           return GridView.builder(
@@ -90,7 +92,7 @@ class MoreFoodListScreen extends StatelessWidget {
             return const Text('오류가 발생했습니다.');
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const main.LoadingIndicator();
           }
 
           return GridView.builder(
