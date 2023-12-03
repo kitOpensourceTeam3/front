@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, unused_import, file_names
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/edit_food.dart';
 import 'package:flutter_application/add_food.dart';
@@ -23,7 +24,8 @@ class MyApp extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<MyApp>
+    with SingleTickerProviderStateMixin {
   late TabController controller;
   List<NewTile> fridgeTiles = []; //아마 냉장실 리스트타일들 관리하는 리스트
 
@@ -31,6 +33,7 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
   void initState() {
     super.initState();
     controller = TabController(length: 3, vsync: this);
+    String uid = getUserUid();
   }
 
   void deleteTile(NewTile tile) {
@@ -57,7 +60,8 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
 
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const AuthWidget()),
+                      MaterialPageRoute(
+                          builder: (context) => const AuthWidget()),
                     );
                   }
                 },
@@ -106,7 +110,8 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
                 // AddFoodScreen으로 화면 전환
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add),
@@ -114,6 +119,19 @@ class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin 
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         ));
+  }
+}
+
+String getUserUid() {
+  User? user = FirebaseAuth.instance.currentUser;
+
+  if (user != null) {
+    String uid = user.uid;
+    print("Current user UID: $uid"); // UID 출력
+    return uid;
+  } else {
+    print("No user is signed in."); // 로그인하지 않은 경우
+    return '';
   }
 }
 
@@ -154,7 +172,8 @@ class NewTile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const EditFoodScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const EditFoodScreen()),
                 );
               },
             ),
