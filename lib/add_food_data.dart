@@ -84,7 +84,12 @@ class _AddFoodDataState extends State<AddFoodData> {
               if (imageData.isNotEmpty) {
                 String imagePath = imageData.first['f_name'] as String;
 
-                return Image.network(imagePath, height: 90, width: 100);
+                return Image.network(
+                  imagePath,
+                  height: 90,
+                  width: 100,
+                  fit: BoxFit.contain,
+                );
               } else {
                 return const Text("No data found");
               }

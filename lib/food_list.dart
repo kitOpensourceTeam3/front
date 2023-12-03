@@ -35,85 +35,89 @@ class _FoodListScreenState extends State<FoodListScreen> {
         child: Column(
           children: [
             // 첫 번째 그리드뷰
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('food_type').orderBy('id').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text('오류가 발생했습니다.');
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const main.LoadingIndicator();
-                }
+            Container(
+              margin: EdgeInsets.only(top: 10.0),
+              child: StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance.collection('food_type').orderBy('id').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text('오류가 발생했습니다.');
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const main.LoadingIndicator();
+                  }
 
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
-                    childAspectRatio: 1.0,
-                    mainAxisSpacing: 4,
-                  ),
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    var foodType = snapshot.data!.docs[index];
-                    String imgId = foodType['img_id'].toString();
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 5,
+                      childAspectRatio: 1.0,
+                      mainAxisSpacing: 4,
+                    ),
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      var foodType = snapshot.data!.docs[index];
+                      String imgId = foodType['img_id'].toString();
 
-                    return FutureBuilder<String>(
-                      future: _getImageLink(imgId),
-                      builder: (context, imageSnapshot) {
-                        if (imageSnapshot.connectionState == ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        }
-                        if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
-                          return const Icon(Icons.error);
-                        }
+                      return FutureBuilder<String>(
+                        future: _getImageLink(imgId),
+                        builder: (context, imageSnapshot) {
+                          if (imageSnapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+                          if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
+                            return const Icon(Icons.error);
+                          }
 
-                        return InkWell(
-                          onTap: () {
-                            setState(() {
-                              selectedFoodTypeId = foodType['id'];
-                            });
-                          },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Container(
-                              margin: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Image.network(
-                                      imageSnapshot.data!,
-                                      fit: BoxFit.contain,
-                                    ),
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedFoodTypeId = foodType['id'];
+                              });
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                margin: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.blue,
+                                    width: 2,
                                   ),
-                                  Container(
-                                    margin: EdgeInsets.only(bottom: 2.0),
-                                    child: Text(
-                                      foodType['name'],
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Image.network(
+                                        imageSnapshot.data!,
+                                        fit: BoxFit.contain,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 2.0),
+                                      child: Text(
+                                        foodType['name'],
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
             // 가로선 추가
             if (selectedFoodTypeId != null)
