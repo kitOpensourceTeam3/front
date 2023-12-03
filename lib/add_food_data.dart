@@ -85,8 +85,9 @@ class _AddFoodDataState extends State<AddFoodData> {
 
                 return Image.network(
                   imagePath,
+                  height: 90,
                   width: 100,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 );
               } else {
                 return const Text("No data found");
