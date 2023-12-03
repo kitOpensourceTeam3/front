@@ -98,11 +98,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
               if (imageData.isNotEmpty) {
                 String imagePath = imageData.first['f_name'] as String;
 
-                return Image.network(
-                  imagePath,
-                  width: 100,
-                  fit: BoxFit.cover,
-                );
+                return Image.network(imagePath, height: 90, width: 100);
               } else {
                 return const Text("No data found");
               }
