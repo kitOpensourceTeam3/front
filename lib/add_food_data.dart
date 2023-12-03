@@ -84,6 +84,7 @@ class _AddFoodDataState extends State<AddFoodData> {
 
                 return Image.network(
                   imagePath,
+                  height: 90,
                   width: 100,
                   fit: BoxFit.contain,
                 );
