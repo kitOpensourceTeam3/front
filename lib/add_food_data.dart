@@ -5,8 +5,9 @@ import 'package:intl/intl.dart';
 
 class AddFoodData extends StatefulWidget {
   final FoodData foodData;
+  final int foodId;
 
-  const AddFoodData({super.key, required this.foodData});
+  const AddFoodData({super.key, required this.foodData, required this.foodId});
 
   @override
   State<AddFoodData> createState() => _AddFoodDataState();
@@ -50,7 +51,7 @@ class _AddFoodDataState extends State<AddFoodData> {
             });
           }),
           buildNoteSection(widget.foodData.noteController),
-          buildAddButton(),
+          buildAddButton(widget.foodId, widget.foodData),
         ],
       ),
     );
@@ -246,7 +247,7 @@ class _AddFoodDataState extends State<AddFoodData> {
     );
   }
 
-  Positioned buildAddButton() {
+  Positioned buildAddButton(int foodId, FoodData foodData) {
     return Positioned(
       top: 530,
       left: 50,

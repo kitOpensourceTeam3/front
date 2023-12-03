@@ -9,7 +9,7 @@ import 'package:flutter_application/data_class.dart';
 class AddFoodScreen extends StatefulWidget {
   final int foodId;
 
-  const AddFoodScreen({Key? key, required this.foodId}) : super(key: key);
+  const AddFoodScreen({super.key, required this.foodId});
 
   @override
   _AddFoodScreenState createState() => _AddFoodScreenState();
@@ -50,7 +50,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             namePath: foodDataSnapshot['name'],
             exp_date: foodDataSnapshot['exp_date'],
           );
-          return AddFoodData(foodData: foodData);
+          return AddFoodData(foodData: foodData, foodId: widget.foodId);
         },
       ),
     );
