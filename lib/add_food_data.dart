@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/add_firestore_data.dart';
 import 'package:flutter_application/data_class.dart';
 import 'package:intl/intl.dart';
 
@@ -254,8 +255,7 @@ class _AddFoodDataState extends State<AddFoodData> {
       right: 50,
       child: ElevatedButton(
         onPressed: () {
-          // 여기에 Firestore에 데이터 추가하는 로직 추가
-          // foodData를 이용하여 필요한 데이터를 Firestore에 저장
+          // AddFirestoreData(foodId: foodId, foodData: foodData);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
