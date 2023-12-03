@@ -21,7 +21,7 @@ class FoodListScreen extends StatelessWidget {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('food_type').snapshots(),
+        stream: FirebaseFirestore.instance.collection('food_type').orderBy('id').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('오류가 발생했습니다.');
