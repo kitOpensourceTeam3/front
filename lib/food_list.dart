@@ -112,7 +112,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddFoodScreen(food_Id: moreFoodData['id']),
+                              builder: (context) => AddFoodScreen(foodId: moreFoodData['id']),
                             ),
                           );
                         },
