@@ -86,7 +86,6 @@ class _HomeScreenState extends State<MyApp>
                   ),
                 ],
                 bottom: TabBar(
-                  controller: controller,
                   tabs: const <Widget>[
                     Tab(text: '냉장실'),
                     Tab(text: '냉동실'),
@@ -140,24 +139,39 @@ class FoodListTab extends StatelessWidget {
           return ListView.builder(
             itemCount: snapshot.data![tabType]!.length,
             itemBuilder: (context, index) {
-              var data = snapshot.data?[tabType]?[index];
-              print(data?['exp_day'].toDate());
+              var data = snapshot.data![tabType]![index];
+              int id = data['f_id'];
 
-              return data != null
-                  ? NewTile(
+              return FutureBuilder<String>(
+                future: getFoodNameByFid(id), // 'f_id'를 전달하여 호출
+                builder: (context, nameSnapshot) {
+                  if (nameSnapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (nameSnapshot.hasError) {
+                    return Text('Error: ${nameSnapshot.error}');
+                  } else if (nameSnapshot.hasData) {
+                    String foodName = nameSnapshot.data!;
+
+                    return NewTile(
                       remainingDays: calculateRemainingDays(
-                        (data['add_day'])?.toDate() ?? DateTime.now(),
-                        (data['exp_day'])?.toDate() ?? DateTime.now(),
+                        (data['add_day'] as Timestamp?)!.toDate(),
+                        (data['exp_day'] as Timestamp?)!.toDate(),
                       ),
-                      foodName: data['type'],
+                      foodName: foodName,
                       onEdit: () {
                         // 편집 로직
                       },
                       onDelete: () {
                         // 삭제 로직
+                        String? docId = snapshot.data?[tabType]?[index].id;
+                        deleteFoodData(docId);
                       },
-                    )
-                  : SizedBox();
+                    );
+                  } else {
+                    return const Text('No data available');
+                  }
+                },
+              );
             },
           );
         } else {
@@ -165,6 +179,15 @@ class FoodListTab extends StatelessWidget {
         }
       },
     );
+  }
+
+  void deleteFoodData(String? docId) async {
+    await FirebaseFirestore.instance
+        .collection('food_data')
+        .doc(docId)
+        .delete()
+        .then((_) => print('Document successfully deleted'))
+        .catchError((error) => print('Error removing document: $error'));
   }
 
   String calculateRemainingDays(DateTime currentDate, DateTime expDate) {
@@ -194,6 +217,19 @@ Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
     }
   });
   return foodData;
+}
+
+Future<String> getFoodNameByFid(int fid) async {
+  var querySnapshot = await FirebaseFirestore.instance
+      .collection('food_image')
+      .where('id', isEqualTo: fid)
+      .get();
+
+  if (querySnapshot.docs.isNotEmpty) {
+    return querySnapshot.docs[0]['name'];
+  } else {
+    return 'none';
+  }
 }
 
 String getUserUid() {
