@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unused_import, file_names, avoid_print
+// ignore_for_file: library_private_types_in_public_api, unused_import, file_names, avoid_print, invalid_return_type_for_catch_error
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -153,23 +153,20 @@ class _FoodListTabState extends State<FoodListTab> {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
                     String foodName = nameSnapshot.data!;
+                    String? docId = snapshot.data?[widget.tabType]?[index].id;
 
                     return NewTile(
+                      docId: docId!,
                       remainingDays: calculateRemainingDays(
                         (data['add_day'] as Timestamp?)!.toDate(),
                         (data['exp_day'] as Timestamp?)!.toDate(),
                       ),
                       foodName: foodName,
                       quantity: quantity,
-                      onEdit: () {
-                        // 편집 로직
-                      },
                       onDelete: () {
-                        String? docId = snapshot.data?[widget.tabType]?[index].id;
                         deleteFoodData(docId);
                       },
                       onDecrease: () {
-                        String? docId = snapshot.data?[widget.tabType]?[index].id;
                         decreaseFoodQuantity(docId, quantity);
                       },
                     );
@@ -249,19 +246,19 @@ String getUserUid() {
 }
 
 class NewTile extends StatelessWidget {
+  final String? docId;
   final String remainingDays;
   final String foodName;
   final int quantity;
-  final Function()? onEdit;
   final Function()? onDelete;
   final Function()? onDecrease;
 
   const NewTile({
+    required this.docId,
     super.key,
     required this.remainingDays,
     required this.foodName,
     required this.quantity,
-    this.onEdit,
     this.onDelete,
     this.onDecrease,
   });
@@ -286,7 +283,12 @@ class NewTile extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: onEdit,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditFoodScreen(docId: docId!)),
+                );
+              },
             ),
             IconButton(
               icon: const Icon(Icons.delete),
