@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unused_import, file_names
+// ignore_for_file: library_private_types_in_public_api, unused_import, file_names, avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +25,7 @@ class MyApp extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<MyApp>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<MyApp> with SingleTickerProviderStateMixin {
   late TabController controller;
   late Map<String, List<DocumentSnapshot>> foodData;
 
@@ -64,14 +63,12 @@ class _HomeScreenState extends State<MyApp>
                     onSelected: (value) {
                       if (value == 'logout') {
                         AuthWidget authWidget = const AuthWidget();
-                        AuthWidgetState authWidgetState =
-                            authWidget.createState();
+                        AuthWidgetState authWidgetState = authWidget.createState();
                         authWidgetState.signOut();
 
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => const AuthWidget()),
+                          MaterialPageRoute(builder: (context) => const AuthWidget()),
                         );
                       }
                     },
@@ -85,8 +82,8 @@ class _HomeScreenState extends State<MyApp>
                     },
                   ),
                 ],
-                bottom: TabBar(
-                  tabs: const <Widget>[
+                bottom: const TabBar(
+                  tabs: <Widget>[
                     Tab(text: '냉장실'),
                     Tab(text: '냉동실'),
                     Tab(text: '실온'),
@@ -94,7 +91,7 @@ class _HomeScreenState extends State<MyApp>
                 ),
               ),
               //add........................
-              body: TabBarView(
+              body: const TabBarView(
                 children: <Widget>[
                   FoodListTab(tabType: 'cool'),
                   FoodListTab(tabType: 'frozen'),
@@ -107,15 +104,13 @@ class _HomeScreenState extends State<MyApp>
                     // AddFoodScreen으로 화면 전환
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const FoodListScreen()),
+                      MaterialPageRoute(builder: (context) => const FoodListScreen()),
                     );
                   },
                   child: const Icon(Icons.add),
                 ),
               ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.endFloat,
+              floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             )));
   }
 }
@@ -146,13 +141,15 @@ class FoodListTab extends StatelessWidget {
                 future: getFoodNameByFid(id), // 'f_id'를 전달하여 호출
                 builder: (context, nameSnapshot) {
                   if (nameSnapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (nameSnapshot.hasError) {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
                     String foodName = nameSnapshot.data!;
+                    String? docId = snapshot.data?[tabType]?[index].id;
 
                     return NewTile(
+                      docId: docId,
                       remainingDays: calculateRemainingDays(
                         (data['add_day'] as Timestamp?)!.toDate(),
                         (data['exp_day'] as Timestamp?)!.toDate(),
@@ -163,7 +160,6 @@ class FoodListTab extends StatelessWidget {
                       },
                       onDelete: () {
                         // 삭제 로직
-                        String? docId = snapshot.data?[tabType]?[index].id;
                         deleteFoodData(docId);
                       },
                     );
@@ -196,34 +192,29 @@ class FoodListTab extends StatelessWidget {
   }
 }
 
-Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
-    String uid) async {
+Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) async {
   Map<String, List<DocumentSnapshot>> foodData = {
     'cool': [],
     'frozen': [],
     'room': [],
   };
 
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_data')
-      .where('uid', isEqualTo: uid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
 
-  querySnapshot.docs.forEach((doc) {
+  for (var doc in querySnapshot.docs) {
     String type = doc['type'];
 
     if (foodData.containsKey(type)) {
       foodData[type]?.add(doc);
     }
-  });
+  }
   return foodData;
 }
 
 Future<String> getFoodNameByFid(int fid) async {
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_image')
-      .where('id', isEqualTo: fid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_image').where('id', isEqualTo: fid).get();
 
   if (querySnapshot.docs.isNotEmpty) {
     return querySnapshot.docs[0]['name'];
@@ -243,12 +234,14 @@ String getUserUid() {
 }
 
 class NewTile extends StatelessWidget {
+  final String? docId;
   final String remainingDays;
   final String foodName;
   final Function()? onEdit;
   final Function()? onDelete;
 
   const NewTile({
+    required this.docId,
     super.key,
     required this.remainingDays,
     required this.foodName,
@@ -279,8 +272,7 @@ class NewTile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const EditFoodScreen()),
+                  MaterialPageRoute(builder: (context) => EditFoodScreen(docId: docId!)),
                 );
               },
             ),

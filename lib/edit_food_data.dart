@@ -1,20 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/add_firestore_data.dart';
 import 'package:flutter_application/data_class.dart';
+import 'package:flutter_application/edit_firestore_data.dart';
 import 'package:intl/intl.dart';
 
-class AddFoodData extends StatefulWidget {
-  final FoodData foodData;
-  final int foodId;
+class EditFoodData extends StatefulWidget {
+  final FoodEdit foodEdit;
+  final String docId;
 
-  const AddFoodData({super.key, required this.foodData, required this.foodId});
+  const EditFoodData({super.key, required this.foodEdit, required this.docId});
 
   @override
-  State<AddFoodData> createState() => _AddFoodDataState();
+  State<EditFoodData> createState() => _EditFoodDataState();
 }
 
-class _AddFoodDataState extends State<AddFoodData> {
+class _EditFoodDataState extends State<EditFoodData> {
   final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
   final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
   final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
@@ -22,35 +22,88 @@ class _AddFoodDataState extends State<AddFoodData> {
       const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
   final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
 
+  late int imagePath;
+  late String namePath;
+  late String storageType;
+  late String memoString;
+  late DateTime selectedDate;
+  late DateTime expirationDate;
+  TextEditingController noteController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          buildImageSection(widget.foodData.imagePath),
-          buildNameSection(widget.foodData.namePath),
-          buildStorageSection(widget.foodData.selectedStorage),
-          buildQuantitySection(widget.foodData.quantity),
-          buildDivider(),
-          buildDateSection('등록일', widget.foodData.selectedDate, () {
-            _selectDate(context, widget.foodData.selectedDate, (picked) {
-              setState(() {
-                widget.foodData.selectedDate = picked;
-              });
-            });
-          }),
-          buildDateSection('소비기한', widget.foodData.expirationDate, () {
-            _selectDate(context, widget.foodData.expirationDate, (picked) {
-              setState(() {
-                widget.foodData.expirationDate = picked;
-              });
-            });
-          }),
-          buildNoteSection(widget.foodData.noteController),
-          buildAddButton(widget.foodId, widget.foodData),
-        ],
-      ),
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('food_list')
+          .doc(widget.foodEdit.f_id.toString())
+          .get(),
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          return const Text('No data found.');
+        }
+
+        var foodListData = snapshot.data!.data() as Map<String, dynamic>;
+
+        imagePath = foodListData['img_id'];
+        namePath = foodListData['name'];
+
+        switch (widget.foodEdit.type) {
+          case 'cool':
+            storageType = '냉장고';
+            break;
+          case 'frozen':
+            storageType = '냉동고';
+            break;
+          case 'room':
+            storageType = '상온';
+            break;
+          default:
+            storageType = 'unknown';
+            break;
+        }
+
+        selectedDate = widget.foodEdit.add_day.toDate();
+        expirationDate = widget.foodEdit.exp_day.toDate();
+        memoString = widget.foodEdit.memo;
+        noteController.text = memoString;
+
+        return Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              buildImageSection(imagePath),
+              buildNameSection(namePath),
+              buildStorageSection(storageType),
+              buildQuantitySection(widget.foodEdit.quantity),
+              buildDivider(),
+              buildDateSection('등록일', selectedDate, () {
+                _selectDate(context, selectedDate, (picked) {
+                  setState(() {
+                    selectedDate = picked;
+                  });
+                });
+              }),
+              buildDateSection('소비기한', expirationDate, () {
+                _selectDate(context, expirationDate, (picked) {
+                  setState(() {
+                    expirationDate = picked;
+                  });
+                });
+              }),
+              buildNoteSection(noteController),
+              buildEditButton(widget.docId, widget.foodEdit),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -133,10 +186,10 @@ class _AddFoodDataState extends State<AddFoodData> {
         children: [
           Text('보관장소', style: boldStyle),
           DropdownButton<String>(
-            value: widget.foodData.selectedStorage,
+            value: selectedStorage,
             onChanged: (String? newValue) {
               setState(() {
-                widget.foodData.selectedStorage = newValue!;
+                selectedStorage = newValue!;
               });
             },
             items: storageOptions.map<DropdownMenuItem<String>>((String value) {
@@ -166,18 +219,18 @@ class _AddFoodDataState extends State<AddFoodData> {
                 icon: const Icon(Icons.remove),
                 onPressed: () {
                   setState(() {
-                    if (widget.foodData.quantity > 1) {
-                      widget.foodData.quantity--;
+                    if (widget.foodEdit.quantity > 1) {
+                      widget.foodEdit.quantity--;
                     }
                   });
                 },
               ),
-              Text('${widget.foodData.quantity}', style: const TextStyle(fontSize: 16)),
+              Text('${widget.foodEdit.quantity}', style: const TextStyle(fontSize: 16)),
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
                   setState(() {
-                    widget.foodData.quantity++;
+                    widget.foodEdit.quantity++;
                   });
                 },
               ),
@@ -231,7 +284,7 @@ class _AddFoodDataState extends State<AddFoodData> {
           borderRadius: BorderRadius.circular(5),
         ),
         child: TextField(
-          controller: widget.foodData.noteController,
+          controller: noteController,
           maxLines: null,
           keyboardType: TextInputType.multiline,
           decoration: const InputDecoration(
@@ -245,17 +298,34 @@ class _AddFoodDataState extends State<AddFoodData> {
     );
   }
 
-  Positioned buildAddButton(int foodId, FoodData foodData) {
+  Positioned buildEditButton(String docId, FoodEdit foodEdit) {
     return Positioned(
       top: 530,
       left: 50,
       right: 50,
       child: ElevatedButton(
         onPressed: () {
+          foodEdit.add_day = Timestamp.fromDate(selectedDate);
+          foodEdit.exp_day = Timestamp.fromDate(expirationDate);
+          foodEdit.memo = noteController.text;
+          switch (storageType) {
+            case '냉장고':
+              foodEdit.type = 'cool';
+              break;
+            case '냉동고':
+              foodEdit.type = 'frozen';
+              break;
+            case '상온':
+              foodEdit.type = 'room';
+              break;
+            default:
+              foodEdit.type = 'unknown';
+              break;
+          }
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) => AddFirestoreData(foodId: foodId, foodData: foodData)));
+                  builder: (context) => EditFirestoreData(docId: docId, foodEdit: foodEdit)));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
@@ -265,7 +335,7 @@ class _AddFoodDataState extends State<AddFoodData> {
             borderRadius: BorderRadius.circular(20.0),
           ),
         ),
-        child: const Text('추가'),
+        child: const Text('수정'),
       ),
     );
   }
