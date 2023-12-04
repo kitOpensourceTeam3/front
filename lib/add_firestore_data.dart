@@ -46,7 +46,9 @@ class AddFirestoreData extends StatelessWidget {
 
     if (uid != null) {
       createNewFoodData(uid);
-      Navigator.pop(context);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
     }
 
     return Container();
