@@ -193,12 +193,15 @@ class FoodListTab extends StatelessWidget {
 }
 
 Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) async {
+Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) async {
   Map<String, List<DocumentSnapshot>> foodData = {
     'cool': [],
     'frozen': [],
     'room': [],
   };
 
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
   var querySnapshot =
       await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
 
@@ -213,6 +216,8 @@ Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) 
 }
 
 Future<String> getFoodNameByFid(int fid) async {
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_image').where('id', isEqualTo: fid).get();
   var querySnapshot =
       await FirebaseFirestore.instance.collection('food_image').where('id', isEqualTo: fid).get();
 
