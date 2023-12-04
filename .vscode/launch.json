@@ -2,12 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Flutter",
-      "type": "dart",
+      "name": "Flutter: Run in Chrome (HTML Renderer)",
       "request": "launch",
-      "program": "lib/main.dart",
+      "type": "dart",
       "args": ["-d", "chrome", "--web-renderer", "html", "--release"]
     }
-
   ]
 }
