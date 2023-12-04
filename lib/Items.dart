@@ -1,9 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api, unused_import, file_names
-
 import 'package:flutter/material.dart';
-import 'package:flutter_application/food_list.dart';
 import 'package:flutter_application/edit_food.dart';
 import 'package:flutter_application/add_food.dart';
+import 'package:flutter_application/food_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -142,12 +140,13 @@ class _FoodListTabState extends State<FoodListTab> {
             itemBuilder: (context, index) {
               var data = snapshot.data![widget.tabType]![index];
               int id = data['f_id'];
+              int quantity = data['quantity'];
 
               return FutureBuilder<String>(
                 future: getFoodNameByFid(id),
                 builder: (context, nameSnapshot) {
                   if (nameSnapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (nameSnapshot.hasError) {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
@@ -159,12 +158,17 @@ class _FoodListTabState extends State<FoodListTab> {
                         (data['exp_day'] as Timestamp?)!.toDate(),
                       ),
                       foodName: foodName,
+                      quantity: quantity,
                       onEdit: () {
                         // 편집 로직
                       },
                       onDelete: () {
                         String? docId = snapshot.data?[widget.tabType]?[index].id;
                         deleteFoodData(docId);
+                      },
+                      onDecrease: () {
+                        String? docId = snapshot.data?[widget.tabType]?[index].id;
+                        decreaseFoodQuantity(docId, quantity);
                       },
                     );
                   } else {
@@ -179,6 +183,20 @@ class _FoodListTabState extends State<FoodListTab> {
         }
       },
     );
+  }
+
+  void decreaseFoodQuantity(String? docId, int currentQuantity) async {
+    if (currentQuantity <= 1) {
+      deleteFoodData(docId);
+    } else {
+      await FirebaseFirestore.instance
+          .collection('food_data')
+          .doc(docId)
+          .update({'quantity': FieldValue.increment(-1)}).then((_) {
+        refreshFoodData();
+        setState(() {});
+      }).catchError((error) => print('Error updating document: $error'));
+    }
   }
 
   void deleteFoodData(String? docId) async {
@@ -205,13 +223,10 @@ Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) 
   var querySnapshot =
       await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
 
-  querySnapshot.docs.forEach((doc) {
+  for (var doc in querySnapshot.docs) {
     String type = doc['type'];
-
-    if (foodData.containsKey(type)) {
-      foodData[type]?.add(doc);
-    }
-  });
+    foodData[type]?.add(doc);
+  }
   return foodData;
 }
 
@@ -228,26 +243,25 @@ Future<String> getFoodNameByFid(int fid) async {
 
 String getUserUid() {
   User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    String uid = user.uid;
-    return uid;
-  } else {
-    return '';
-  }
+  return user?.uid ?? '';
 }
 
 class NewTile extends StatelessWidget {
   final String remainingDays;
   final String foodName;
+  final int quantity;
   final Function()? onEdit;
   final Function()? onDelete;
+  final Function()? onDecrease;
 
   const NewTile({
     super.key,
     required this.remainingDays,
     required this.foodName,
+    required this.quantity,
     this.onEdit,
     this.onDelete,
+    this.onDecrease,
   });
 
   @override
@@ -256,28 +270,26 @@ class NewTile extends StatelessWidget {
       elevation: 4,
       child: ListTile(
         title: Text(foodName),
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              remainingDays,
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
+        leading: Text(
+          remainingDays,
+          style: const TextStyle(fontSize: 18),
         ),
+        subtitle: Text('수량: $quantity'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const EditFoodScreen()),
-                );
-              },
+              icon: const Icon(Icons.remove),
+              onPressed: quantity > 1 ? onDecrease : null,
             ),
-            IconButton(icon: const Icon(Icons.delete), onPressed: onDelete),
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: onEdit,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: onDelete,
+            ),
           ],
         ),
       ),
