@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application/add_food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,7 +38,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
           children: [
             // 첫 번째 그리드뷰
             Container(
-              margin: EdgeInsets.only(top: 10.0),
+              margin: const EdgeInsets.only(top: 10.0),
               child: StreamBuilder<QuerySnapshot>(
                 stream:
                     FirebaseFirestore.instance.collection('food_type').orderBy('id').snapshots(),
@@ -98,10 +100,10 @@ class _FoodListScreenState extends State<FoodListScreen> {
                                       ),
                                     ),
                                     Container(
-                                      margin: EdgeInsets.only(bottom: 2.0),
+                                      margin: const EdgeInsets.only(bottom: 2.0),
                                       child: Text(
                                         foodType['name'],
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 12,
                                         ),
@@ -193,10 +195,10 @@ class _FoodListScreenState extends State<FoodListScreen> {
                                     ),
                                   ),
                                   Container(
-                                    margin: EdgeInsets.only(bottom: 2.0),
+                                    margin: const EdgeInsets.only(bottom: 2.0),
                                     child: Text(
                                       moreFoodData['name'],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 12,
                                       ),

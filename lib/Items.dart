@@ -1,8 +1,10 @@
+// ignore_for_file: library_private_types_in_public_api, unused_import, file_names, avoid_print, invalid_return_type_for_catch_error
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/edit_food.dart';
 import 'package:flutter_application/add_food.dart';
 import 'package:flutter_application/food_list.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
@@ -65,15 +67,15 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                 },
               ),
             ],
-            bottom: TabBar(
-              tabs: const <Widget>[
+            bottom: const TabBar(
+              tabs: <Widget>[
                 Tab(text: '냉장실'),
                 Tab(text: '냉동실'),
                 Tab(text: '실온'),
               ],
             ),
           ),
-          body: TabBarView(
+          body: const TabBarView(
             children: <Widget>[
               FoodListTab(tabType: 'cool'),
               FoodListTab(tabType: 'frozen'),
@@ -151,23 +153,20 @@ class _FoodListTabState extends State<FoodListTab> {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
                     String foodName = nameSnapshot.data!;
+                    String? docId = snapshot.data?[widget.tabType]?[index].id;
 
                     return NewTile(
+                      docId: docId!,
                       remainingDays: calculateRemainingDays(
                         (data['add_day'] as Timestamp?)!.toDate(),
                         (data['exp_day'] as Timestamp?)!.toDate(),
                       ),
                       foodName: foodName,
                       quantity: quantity,
-                      onEdit: () {
-                        // 편집 로직
-                      },
                       onDelete: () {
-                        String? docId = snapshot.data?[widget.tabType]?[index].id;
                         deleteFoodData(docId);
                       },
                       onDecrease: () {
-                        String? docId = snapshot.data?[widget.tabType]?[index].id;
                         decreaseFoodQuantity(docId, quantity);
                       },
                     );
@@ -247,19 +246,19 @@ String getUserUid() {
 }
 
 class NewTile extends StatelessWidget {
+  final String? docId;
   final String remainingDays;
   final String foodName;
   final int quantity;
-  final Function()? onEdit;
   final Function()? onDelete;
   final Function()? onDecrease;
 
   const NewTile({
+    required this.docId,
     super.key,
     required this.remainingDays,
     required this.foodName,
     required this.quantity,
-    this.onEdit,
     this.onDelete,
     this.onDecrease,
   });
@@ -284,7 +283,12 @@ class NewTile extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: onEdit,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditFoodScreen(docId: docId!)),
+                );
+              },
             ),
             IconButton(
               icon: const Icon(Icons.delete),
