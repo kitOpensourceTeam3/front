@@ -27,19 +27,12 @@ class MyApp extends StatefulWidget {
 class _HomeScreenState extends State<MyApp>
     with SingleTickerProviderStateMixin {
   late TabController controller;
-  List<NewTile> fridgeTiles = []; //아마 냉장실 리스트타일들 관리하는 리스트
 
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 3, vsync: this);
     String uid = getUserUid();
-  }
-
-  void deleteTile(NewTile tile) {
-    setState(() {
-      fridgeTiles.remove(tile);
-    });
   }
 
   @override
