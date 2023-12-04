@@ -256,7 +256,7 @@ class _AddFoodDataState extends State<AddFoodData> {
       right: 50,
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(
+          Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                   builder: (context) => AddFirestoreData(foodId: foodId, foodData: foodData)));

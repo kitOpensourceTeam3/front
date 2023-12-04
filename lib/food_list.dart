@@ -166,7 +166,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
 
                           return InkWell(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => AddFoodScreen(foodId: moreFoodData['id']),
