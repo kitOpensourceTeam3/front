@@ -1,16 +1,16 @@
 // ignore_for_file: library_private_types_in_public_api, unused_import, file_names
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/food_list.dart';
 import 'package:flutter_application/edit_food.dart';
 import 'package:flutter_application/add_food.dart';
-import 'package:flutter_application/food_list.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'package:flutter_application/main.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -22,112 +22,113 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class _HomeScreenState extends State<MyApp>
-    with SingleTickerProviderStateMixin {
+class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   late TabController controller;
-  late Map<String, List<DocumentSnapshot>> foodData;
 
   @override
   void initState() {
     super.initState();
-    loadFoodData();
     controller = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
-    controller.dispose(); // 위젯이 제거될 때 controller를 정리합니다.
+    controller.dispose();
     super.dispose();
-  }
-
-  void loadFoodData() async {
-    String uid = getUserUid();
-    foodData = await getFoodDataByUidAndType(uid);
-    setState(() {}); // 데이터 로딩 후 UI 업데이트
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: DefaultTabController(
-            length: 3,
-            child: Scaffold(
-              appBar: AppBar(
-                title: const Text('냉장고를 부탁해'),
-                actions: <Widget>[
-                  PopupMenuButton<String>(
-                    offset: const Offset(0, 40),
-                    onSelected: (value) {
-                      if (value == 'logout') {
-                        AuthWidget authWidget = const AuthWidget();
-                        AuthWidgetState authWidgetState =
-                            authWidget.createState();
-                        authWidgetState.signOut();
-
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AuthWidget()),
-                        );
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'로그아웃'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: 'logout',
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ],
-                bottom: TabBar(
-                  tabs: const <Widget>[
-                    Tab(text: '냉장실'),
-                    Tab(text: '냉동실'),
-                    Tab(text: '실온'),
-                  ],
-                ),
-              ),
-              //add........................
-              body: TabBarView(
-                children: <Widget>[
-                  FoodListTab(tabType: 'cool'),
-                  FoodListTab(tabType: 'frozen'),
-                  FoodListTab(tabType: 'room'),
-                ],
-              ),
-              floatingActionButton: Builder(
-                builder: (context) => FloatingActionButton(
-                  onPressed: () {
-                    // AddFoodScreen으로 화면 전환
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const FoodListScreen()),
+      debugShowCheckedModeBanner: false,
+      home: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('냉장고를 부탁해'),
+            actions: <Widget>[
+              PopupMenuButton<String>(
+                offset: const Offset(0, 40),
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    signOut();
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return {'로그아웃'}.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: 'logout',
+                      child: Text(choice),
                     );
-                  },
-                  child: const Icon(Icons.add),
-                ),
+                  }).toList();
+                },
               ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.endFloat,
-            )));
+            ],
+            bottom: TabBar(
+              tabs: const <Widget>[
+                Tab(text: '냉장실'),
+                Tab(text: '냉동실'),
+                Tab(text: '실온'),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            children: <Widget>[
+              FoodListTab(tabType: 'cool'),
+              FoodListTab(tabType: 'frozen'),
+              FoodListTab(tabType: 'room'),
+            ],
+          ),
+          floatingActionButton: Builder(
+            builder: (context) => FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        ),
+      ),
+    );
+  }
+
+  void signOut() async {
+    await FirebaseAuth.instance.signOut();
   }
 }
 
-class FoodListTab extends StatelessWidget {
+class FoodListTab extends StatefulWidget {
   final String tabType;
   const FoodListTab({Key? key, required this.tabType}) : super(key: key);
 
   @override
+  _FoodListTabState createState() => _FoodListTabState();
+}
+
+class _FoodListTabState extends State<FoodListTab> {
+  late Future<Map<String, List<DocumentSnapshot>>> foodDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    refreshFoodData();
+  }
+
+  void refreshFoodData() {
+    foodDataFuture = getFoodDataByUidAndType(getUserUid());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, List<DocumentSnapshot>>>(
-      future: getFoodDataByUidAndType(getUserUid()),
+      future: foodDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -137,13 +138,13 @@ class FoodListTab extends StatelessWidget {
         }
         if (snapshot.hasData) {
           return ListView.builder(
-            itemCount: snapshot.data![tabType]!.length,
+            itemCount: snapshot.data![widget.tabType]!.length,
             itemBuilder: (context, index) {
-              var data = snapshot.data![tabType]![index];
+              var data = snapshot.data![widget.tabType]![index];
               int id = data['f_id'];
 
               return FutureBuilder<String>(
-                future: getFoodNameByFid(id), // 'f_id'를 전달하여 호출
+                future: getFoodNameByFid(id),
                 builder: (context, nameSnapshot) {
                   if (nameSnapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -162,8 +163,7 @@ class FoodListTab extends StatelessWidget {
                         // 편집 로직
                       },
                       onDelete: () {
-                        // 삭제 로직
-                        String? docId = snapshot.data?[tabType]?[index].id;
+                        String? docId = snapshot.data?[widget.tabType]?[index].id;
                         deleteFoodData(docId);
                       },
                     );
@@ -182,12 +182,11 @@ class FoodListTab extends StatelessWidget {
   }
 
   void deleteFoodData(String? docId) async {
-    await FirebaseFirestore.instance
-        .collection('food_data')
-        .doc(docId)
-        .delete()
-        .then((_) => print('Document successfully deleted'))
-        .catchError((error) => print('Error removing document: $error'));
+    await FirebaseFirestore.instance.collection('food_data').doc(docId).delete().then((_) {
+      print('Document successfully deleted');
+      refreshFoodData(); // 데이터 삭제 후 화면 새로고침
+      setState(() {}); // 상태 업데이트
+    }).catchError((error) => print('Error removing document: $error'));
   }
 
   String calculateRemainingDays(DateTime currentDate, DateTime expDate) {
@@ -196,18 +195,15 @@ class FoodListTab extends StatelessWidget {
   }
 }
 
-Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
-    String uid) async {
+Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) async {
   Map<String, List<DocumentSnapshot>> foodData = {
     'cool': [],
     'frozen': [],
     'room': [],
   };
 
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_data')
-      .where('uid', isEqualTo: uid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
 
   querySnapshot.docs.forEach((doc) {
     String type = doc['type'];
@@ -220,10 +216,8 @@ Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
 }
 
 Future<String> getFoodNameByFid(int fid) async {
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_image')
-      .where('id', isEqualTo: fid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_image').where('id', isEqualTo: fid).get();
 
   if (querySnapshot.docs.isNotEmpty) {
     return querySnapshot.docs[0]['name'];
@@ -279,8 +273,7 @@ class NewTile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const EditFoodScreen()),
+                  MaterialPageRoute(builder: (context) => const EditFoodScreen()),
                 );
               },
             ),
