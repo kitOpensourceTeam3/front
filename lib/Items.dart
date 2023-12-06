@@ -54,7 +54,14 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                 offset: const Offset(0, 40),
                 onSelected: (value) {
                   if (value == 'logout') {
-                    signOut();
+                    AuthWidget authWidget = const AuthWidget();
+                    AuthWidgetState authWidgetState = authWidget.createState();
+                    authWidgetState.signOut();
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AuthWidget()),
+                    );
                   }
                 },
                 itemBuilder: (BuildContext context) {

@@ -94,7 +94,6 @@ class AuthWidgetState extends State<AuthWidget> {
 
   void signOut() async {
     await FirebaseAuth.instance.signOut();
-    setState(() => isInput = true);
   }
 
   signUp() async {
