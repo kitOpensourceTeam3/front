@@ -7,6 +7,9 @@ import 'package:flutter_application/add_food.dart';
 import 'package:flutter_application/food_list.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application/items_provider.dart';
+import 'package:flutter_application/refresh_fooddata.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter_application/main.dart';
 
@@ -60,7 +63,8 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const AuthWidget()),
+                      MaterialPageRoute(
+                          builder: (context) => const AuthWidget()),
                     );
                   }
                 },
@@ -94,7 +98,8 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add),
@@ -126,31 +131,28 @@ class _FoodListTabState extends State<FoodListTab> {
   void initState() {
     super.initState();
     refreshFoodData();
+    context.read<ItemsProvider>().loadFoodData();
   }
 
   void refreshFoodData() {
-    foodDataFuture = getFoodDataByUidAndType(getUserUid());
+    foodDataFuture =
+        RefreshFoodData.instance.getFoodDataByUidAndType(getUserUid());
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, List<DocumentSnapshot>>>(
-      future: foodDataFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        }
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-        if (snapshot.hasData) {
+    return Consumer<ItemsProvider>(
+      builder: (context, itemProvider, child) {
+        if (itemProvider.foodData.isNotEmpty) {
+          // foodData가 존재하면 ListView를 구성
           return ListView.builder(
-            itemCount: snapshot.data![widget.tabType]!.length,
+            itemCount: itemProvider.foodData[widget.tabType]!.length,
             itemBuilder: (context, index) {
-              var data = snapshot.data![widget.tabType]![index];
+              var data = itemProvider.foodData[widget.tabType]![index];
               int id = data['f_id'];
               int quantity = data['quantity'];
 
+              // 데이터에 기반한 각 아이템에 대한 UI 구성
               return FutureBuilder<String>(
                 future: getFoodNameByFid(id),
                 builder: (context, nameSnapshot) {
@@ -160,8 +162,10 @@ class _FoodListTabState extends State<FoodListTab> {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
                     String foodName = nameSnapshot.data!;
-                    String? docId = snapshot.data?[widget.tabType]?[index].id;
+                    String? docId =
+                        itemProvider.foodData[widget.tabType]?[index].id;
 
+                    // 데이터에 따라 NewTile 위젯 또는 다른 위젯 반환
                     return NewTile(
                       docId: docId!,
                       remainingDays: calculateRemainingDays(
@@ -185,7 +189,8 @@ class _FoodListTabState extends State<FoodListTab> {
             },
           );
         } else {
-          return const Text('No data available');
+          // foodData가 비어있으면 로딩 인디케이터 표시
+          return const CircularProgressIndicator();
         }
       },
     );
@@ -199,16 +204,20 @@ class _FoodListTabState extends State<FoodListTab> {
           .collection('food_data')
           .doc(docId)
           .update({'quantity': FieldValue.increment(-1)}).then((_) {
-        refreshFoodData();
+        context.read<ItemsProvider>().loadFoodData();
         setState(() {});
       }).catchError((error) => print('Error updating document: $error'));
     }
   }
 
   void deleteFoodData(String? docId) async {
-    await FirebaseFirestore.instance.collection('food_data').doc(docId).delete().then((_) {
+    await FirebaseFirestore.instance
+        .collection('food_data')
+        .doc(docId)
+        .delete()
+        .then((_) {
       print('Document successfully deleted');
-      refreshFoodData(); // 데이터 삭제 후 화면 새로고침
+      context.read<ItemsProvider>().loadFoodData();
       setState(() {}); // 상태 업데이트
     }).catchError((error) => print('Error removing document: $error'));
   }
@@ -219,15 +228,18 @@ class _FoodListTabState extends State<FoodListTab> {
   }
 }
 
-Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) async {
+Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
+    String uid) async {
   Map<String, List<DocumentSnapshot>> foodData = {
     'cool': [],
     'frozen': [],
     'room': [],
   };
 
-  var querySnapshot =
-      await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
+  var querySnapshot = await FirebaseFirestore.instance
+      .collection('food_data')
+      .where('uid', isEqualTo: uid)
+      .get();
 
   for (var doc in querySnapshot.docs) {
     String type = doc['type'];
@@ -237,8 +249,10 @@ Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) 
 }
 
 Future<String> getFoodNameByFid(int fid) async {
-  var querySnapshot =
-      await FirebaseFirestore.instance.collection('food_image').where('id', isEqualTo: fid).get();
+  var querySnapshot = await FirebaseFirestore.instance
+      .collection('food_image')
+      .where('id', isEqualTo: fid)
+      .get();
 
   if (querySnapshot.docs.isNotEmpty) {
     return querySnapshot.docs[0]['name'];
@@ -293,7 +307,8 @@ class NewTile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => EditFoodScreen(docId: docId!)),
+                  MaterialPageRoute(
+                      builder: (context) => EditFoodScreen(docId: docId!)),
                 );
               },
             ),

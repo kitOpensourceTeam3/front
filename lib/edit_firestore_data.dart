@@ -4,12 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/data_class.dart';
+import 'package:flutter_application/items_provider.dart';
+import 'package:provider/provider.dart';
 
 class EditFirestoreData extends StatelessWidget {
   final String docId;
   final FoodEdit foodEdit;
 
-  const EditFirestoreData({super.key, required this.docId, required this.foodEdit});
+  const EditFirestoreData(
+      {super.key, required this.docId, required this.foodEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +27,8 @@ class EditFirestoreData extends StatelessWidget {
         'memo': foodEdit.memo,
       };
 
-      CollectionReference foodDataCollection = FirebaseFirestore.instance.collection("food_data");
+      CollectionReference foodDataCollection =
+          FirebaseFirestore.instance.collection("food_data");
       await foodDataCollection.doc(docId).update(jsonData);
     }
 
@@ -33,6 +37,7 @@ class EditFirestoreData extends StatelessWidget {
     if (uid != null) {
       createNewFoodData();
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<ItemsProvider>().loadFoodData();
         Navigator.pop(context);
       });
     }
