@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="flutter_application"
+        android:label="냉장고를 부탁해"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
