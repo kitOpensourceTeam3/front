@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/add_food_data.dart';
+import 'package:flutter_application/edit_food_more.dart';
 import 'package:flutter_application/edit_food_data.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -51,7 +52,7 @@ class _EditFoodScreenState extends State<EditFoodScreen> {
             add_day: foodDataSnapshot['add_day'],
             exp_day: foodDataSnapshot['exp_day'],
           );
-          return EditFoodData(foodEdit: foodEdit, docId: widget.docId);
+          return EditFoodMoreScreen(foodEdit: foodEdit, docId: widget.docId);
         },
       ),
     );

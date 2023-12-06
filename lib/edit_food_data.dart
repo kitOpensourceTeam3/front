@@ -5,10 +5,17 @@ import 'package:flutter_application/edit_firestore_data.dart';
 import 'package:intl/intl.dart';
 
 class EditFoodData extends StatefulWidget {
+  final int imagePath;
+  final String namePath;
   final FoodEdit foodEdit;
   final String docId;
 
-  const EditFoodData({super.key, required this.foodEdit, required this.docId});
+  const EditFoodData(
+      {super.key,
+      required this.imagePath,
+      required this.namePath,
+      required this.foodEdit,
+      required this.docId});
 
   @override
   State<EditFoodData> createState() => _EditFoodDataState();
@@ -22,88 +29,56 @@ class _EditFoodDataState extends State<EditFoodData> {
       const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
   final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
 
-  late int imagePath;
-  late String namePath;
-  late String storageType;
-  late String memoString;
-  late DateTime selectedDate;
-  late DateTime expirationDate;
+  late String storageType = widget.foodEdit.type;
+  late String memoString = widget.foodEdit.memo;
+  late DateTime selectedDate = widget.foodEdit.add_day.toDate();
+  late DateTime expirationDate = widget.foodEdit.exp_day.toDate();
   TextEditingController noteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance
-          .collection('food_list')
-          .doc(widget.foodEdit.f_id.toString())
-          .get(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        }
-
-        if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Text('No data found.');
-        }
-
-        var foodListData = snapshot.data!.data() as Map<String, dynamic>;
-
-        imagePath = foodListData['img_id'];
-        namePath = foodListData['name'];
-
-        switch (widget.foodEdit.type) {
-          case 'cool':
-            storageType = '냉장고';
-            break;
-          case 'frozen':
-            storageType = '냉동고';
-            break;
-          case 'room':
-            storageType = '상온';
-            break;
-          default:
-            storageType = 'unknown';
-            break;
-        }
-
-        selectedDate = widget.foodEdit.add_day.toDate();
-        expirationDate = widget.foodEdit.exp_day.toDate();
-        memoString = widget.foodEdit.memo;
-        noteController.text = memoString;
-
-        return Center(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              buildImageSection(imagePath),
-              buildNameSection(namePath),
-              buildStorageSection(storageType),
-              buildQuantitySection(widget.foodEdit.quantity),
-              buildDivider(),
-              buildDateSection('등록일', selectedDate, () {
-                _selectDate(context, selectedDate, (picked) {
-                  setState(() {
-                    selectedDate = picked;
-                  });
-                });
-              }),
-              buildDateSection('소비기한', expirationDate, () {
-                _selectDate(context, expirationDate, (picked) {
-                  setState(() {
-                    expirationDate = picked;
-                  });
-                });
-              }),
-              buildNoteSection(noteController),
-              buildEditButton(widget.docId, widget.foodEdit),
-            ],
-          ),
-        );
-      },
+    switch (storageType) {
+      case 'cool' || '냉장고':
+        storageType = '냉장고';
+        break;
+      case 'frozen' || '냉동고':
+        storageType = '냉동고';
+        break;
+      case 'room' || '상온':
+        storageType = '상온';
+        break;
+      default:
+        storageType = 'unknown';
+        break;
+    }
+    noteController.text = memoString;
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          buildImageSection(widget.imagePath),
+          buildNameSection(widget.namePath),
+          buildStorageSection(storageType),
+          buildQuantitySection(widget.foodEdit.quantity),
+          buildDivider(),
+          buildDateSection('등록일', selectedDate, () {
+            _selectDate(context, selectedDate, (picked) {
+              setState(() {
+                selectedDate = picked;
+              });
+            });
+          }),
+          buildDateSection('소비기한', expirationDate, () {
+            _selectDate(context, expirationDate, (picked) {
+              setState(() {
+                expirationDate = picked;
+              });
+            });
+          }),
+          buildNoteSection(noteController),
+          buildEditButton(widget.docId, widget.foodEdit),
+        ],
+      ),
     );
   }
 
@@ -189,7 +164,7 @@ class _EditFoodDataState extends State<EditFoodData> {
             value: selectedStorage,
             onChanged: (String? newValue) {
               setState(() {
-                selectedStorage = newValue!;
+                storageType = newValue!;
               });
             },
             items: storageOptions.map<DropdownMenuItem<String>>((String value) {
@@ -292,6 +267,9 @@ class _EditFoodDataState extends State<EditFoodData> {
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 10),
           ),
+          onChanged: (String? newValue) {
+            memoString = newValue!;
+          },
           style: const TextStyle(fontSize: 14),
         ),
       ),

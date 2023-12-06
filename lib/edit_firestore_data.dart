@@ -13,45 +13,29 @@ class EditFirestoreData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Future<void> createNewFoodData(String uid) async {
-    //   String storageType;
-    // switch (foodData.selectedStorage) {
-    //   case '냉장고':
-    //     storageType = 'cool';
-    //     break;
-    //   case '냉동고':
-    //     storageType = 'frozen';
-    //     break;
-    //   case '상온':
-    //     storageType = 'room';
-    //     break;
-    //   default:
-    //     storageType = 'unknown';
-    //     break;
-    // }
+    Future<void> createNewFoodData() async {
+      Map<String, dynamic> jsonData = {
+        'uid': foodEdit.uid,
+        'f_id': foodEdit.f_id,
+        'quantity': foodEdit.quantity,
+        'add_day': foodEdit.add_day,
+        'exp_day': foodEdit.exp_day,
+        'type': foodEdit.type,
+        'memo': foodEdit.memo,
+      };
 
-    //   Map<String, dynamic> jsonData = {
-    //     'uid': uid,
-    //     'f_id': foodId,
-    //     'quantity': foodData.quantity,
-    //     'add_day': Timestamp.fromDate(foodData.selectedDate),
-    //     'exp_day': Timestamp.fromDate(foodData.expirationDate),
-    //     'type': storageType,
-    //     'memo': foodData.noteController.text,
-    //   };
+      CollectionReference foodDataCollection = FirebaseFirestore.instance.collection("food_data");
+      await foodDataCollection.doc(docId).update(jsonData);
+    }
 
-    //   CollectionReference foodDataCollection = FirebaseFirestore.instance.collection("food_data");
-    //   await foodDataCollection.add(jsonData);
-    // }
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-    // String? uid = FirebaseAuth.instance.currentUser?.uid;
-
-    // if (uid != null) {
-    //   createNewFoodData(uid);
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pop(context);
-    //   });
-    // }
+    if (uid != null) {
+      createNewFoodData();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
+    }
 
     return Container();
   }
