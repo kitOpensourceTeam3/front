@@ -12,6 +12,7 @@ import 'package:flutter_application/refresh_fooddata.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter_application/main.dart';
+import 'package:flutter_application/loding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -157,7 +158,7 @@ class _FoodListTabState extends State<FoodListTab> {
                 future: getFoodNameByFid(id),
                 builder: (context, nameSnapshot) {
                   if (nameSnapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const LoadingIndicator();
                   } else if (nameSnapshot.hasError) {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
@@ -190,7 +191,7 @@ class _FoodListTabState extends State<FoodListTab> {
           );
         } else {
           // foodData가 비어있으면 로딩 인디케이터 표시
-          return const CircularProgressIndicator();
+          return const LoadingIndicator();
         }
       },
     );

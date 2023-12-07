@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/add_firestore_data.dart';
 import 'package:flutter_application/data_class.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_application/loding.dart';
 
 class AddFoodData extends StatefulWidget {
   final FoodData foodData;
@@ -95,7 +96,7 @@ class _AddFoodDataState extends State<AddFoodData> {
               }
             }
 
-            return const CircularProgressIndicator();
+            return const LoadingIndicator();
           },
         ),
       ),
