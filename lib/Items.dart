@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'package:flutter_application/main.dart';
+import 'package:flutter_application/loding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -138,7 +139,7 @@ class _FoodListTabState extends State<FoodListTab> {
       future: foodDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const LoadingIndicator();
         }
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
