@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/add_food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application/main.dart' as main;
+import 'package:flutter_application/loding.dart';
 
 class FoodListScreen extends StatefulWidget {
   const FoodListScreen({super.key});
@@ -47,7 +47,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                     return const Text('오류가 발생했습니다.');
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const main.LoadingIndicator();
+                    return const LoadingIndicator();
                   }
 
                   return GridView.builder(
@@ -67,7 +67,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                         future: _getImageLink(imgId),
                         builder: (context, imageSnapshot) {
                           if (imageSnapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
+                            return const LoadingIndicator();
                           }
                           if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
                             return const Icon(Icons.error);
@@ -140,7 +140,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                     return const Text('오류가 발생했습니다.');
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const main.LoadingIndicator();
+                    return const LoadingIndicator();
                   }
 
                   return GridView.builder(
@@ -160,7 +160,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                         future: _getImageLink(imgId),
                         builder: (context, imageSnapshot) {
                           if (imageSnapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
+                            return const LoadingIndicator();
                           }
                           if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
                             return const Icon(Icons.error);

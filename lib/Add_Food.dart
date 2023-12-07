@@ -5,6 +5,7 @@ import 'package:flutter_application/add_food_data.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application/data_class.dart';
+import 'package:flutter_application/loding.dart';
 
 class AddFoodScreen extends StatefulWidget {
   final int foodId;
@@ -37,7 +38,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const LoadingIndicator();
           }
 
           var foodDataSnapshot = snapshot.data!.docs.first;

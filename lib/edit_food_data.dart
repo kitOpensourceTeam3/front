@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/data_class.dart';
 import 'package:flutter_application/edit_firestore_data.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_application/loding.dart';
 
 class EditFoodData extends StatefulWidget {
   final int imagePath;
@@ -119,7 +120,7 @@ class _EditFoodDataState extends State<EditFoodData> {
               }
             }
 
-            return const CircularProgressIndicator();
+            return const LoadingIndicator();
           },
         ),
       ),

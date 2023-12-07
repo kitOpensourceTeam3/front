@@ -7,6 +7,7 @@ import 'package:flutter_application/edit_food_data.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application/data_class.dart';
+import 'package:flutter_application/loding.dart';
 
 class EditFoodScreen extends StatefulWidget {
   final String docId;
@@ -36,7 +37,7 @@ class _EditFoodScreenState extends State<EditFoodScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const LoadingIndicator();
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Text('No data found.');
