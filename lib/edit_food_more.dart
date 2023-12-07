@@ -6,12 +6,14 @@ import 'package:flutter_application/edit_food_data.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application/data_class.dart';
+import 'package:flutter_application/loding.dart';
 
 class EditFoodMoreScreen extends StatefulWidget {
   final FoodEdit foodEdit;
   final String docId;
 
-  const EditFoodMoreScreen({Key? key, required this.foodEdit, required this.docId})
+  const EditFoodMoreScreen(
+      {Key? key, required this.foodEdit, required this.docId})
       : super(key: key);
 
   @override
@@ -28,7 +30,7 @@ class _EditFoodMoreScreenState extends State<EditFoodMoreScreen> {
       future: fetchDataFromFirestore(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const LoadingIndicator();
         } else if (snapshot.hasError) {
           return Text('오류: ${snapshot.error}');
         } else {
