@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/add_food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application/main.dart' as main;
+import 'package:flutter_application/loding.dart';
 
 class FoodListScreen extends StatefulWidget {
   const FoodListScreen({super.key});
@@ -16,7 +17,10 @@ class _FoodListScreenState extends State<FoodListScreen> {
   int? selectedFoodTypeId;
 
   Future<String> _getImageLink(String imgId) async {
-    var document = await FirebaseFirestore.instance.collection('food_image').doc(imgId).get();
+    var document = await FirebaseFirestore.instance
+        .collection('food_image')
+        .doc(imgId)
+        .get();
     return document.data()?['f_name'] ?? ''; // 이미지 링크 반환, 없으면 빈 문자열 반환
   }
 
@@ -40,20 +44,23 @@ class _FoodListScreenState extends State<FoodListScreen> {
             Container(
               margin: const EdgeInsets.only(top: 10.0),
               child: StreamBuilder<QuerySnapshot>(
-                stream:
-                    FirebaseFirestore.instance.collection('food_type').orderBy('id').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('food_type')
+                    .orderBy('id')
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Text('오류가 발생했습니다.');
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const main.LoadingIndicator();
+                    return const LoadingIndicator();
                   }
 
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 5,
                       childAspectRatio: 1.0,
                       mainAxisSpacing: 4,
@@ -66,10 +73,12 @@ class _FoodListScreenState extends State<FoodListScreen> {
                       return FutureBuilder<String>(
                         future: _getImageLink(imgId),
                         builder: (context, imageSnapshot) {
-                          if (imageSnapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
+                          if (imageSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const LoadingIndicator();
                           }
-                          if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
+                          if (imageSnapshot.hasError ||
+                              imageSnapshot.data!.isEmpty) {
                             return const Icon(Icons.error);
                           }
 
@@ -100,7 +109,8 @@ class _FoodListScreenState extends State<FoodListScreen> {
                                       ),
                                     ),
                                     Container(
-                                      margin: const EdgeInsets.only(bottom: 2.0),
+                                      margin:
+                                          const EdgeInsets.only(bottom: 2.0),
                                       child: Text(
                                         foodType['name'],
                                         style: const TextStyle(
@@ -140,13 +150,14 @@ class _FoodListScreenState extends State<FoodListScreen> {
                     return const Text('오류가 발생했습니다.');
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const main.LoadingIndicator();
+                    return const LoadingIndicator();
                   }
 
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 5,
                       childAspectRatio: 1.0,
                       mainAxisSpacing: 4,
@@ -159,10 +170,12 @@ class _FoodListScreenState extends State<FoodListScreen> {
                       return FutureBuilder<String>(
                         future: _getImageLink(imgId),
                         builder: (context, imageSnapshot) {
-                          if (imageSnapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
+                          if (imageSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const LoadingIndicator();
                           }
-                          if (imageSnapshot.hasError || imageSnapshot.data!.isEmpty) {
+                          if (imageSnapshot.hasError ||
+                              imageSnapshot.data!.isEmpty) {
                             return const Icon(Icons.error);
                           }
 
@@ -171,7 +184,8 @@ class _FoodListScreenState extends State<FoodListScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AddFoodScreen(foodId: moreFoodData['id']),
+                                  builder: (context) =>
+                                      AddFoodScreen(foodId: moreFoodData['id']),
                                 ),
                               );
                             },
