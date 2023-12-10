@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/add_food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application/main.dart' as main;
 import 'package:flutter_application/loding.dart';
 
 class FoodListScreen extends StatefulWidget {
@@ -95,7 +94,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: Colors.blue,
+                                    color: const Color(0xFF00A9FF),
                                     width: 2,
                                   ),
                                 ),
@@ -195,7 +194,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Colors.green,
+                                  color: const Color(0xFF89CFF3),
                                   width: 2,
                                 ),
                               ),
