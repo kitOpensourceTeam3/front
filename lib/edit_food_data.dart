@@ -23,15 +23,12 @@ class EditFoodData extends StatefulWidget {
 }
 
 class _EditFoodDataState extends State<EditFoodData> {
-  final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
-  final TextStyle boldStyle =
-      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final TextStyle hintStyle =
-      const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
+  final List<String> storageOptions = ['냉장실', '냉동실', '실온'];
+  final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
   final InputBorder borderStyle =
       const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
-  final EdgeInsetsGeometry paddingSymmetric10 =
-      const EdgeInsets.symmetric(horizontal: 10);
+  final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
 
   late String storageType = widget.foodEdit.type;
   late String memoString = widget.foodEdit.memo;
@@ -42,14 +39,14 @@ class _EditFoodDataState extends State<EditFoodData> {
   @override
   Widget build(BuildContext context) {
     switch (storageType) {
-      case 'cool' || '냉장고':
-        storageType = '냉장고';
+      case 'cool' || '냉장실':
+        storageType = '냉장실';
         break;
-      case 'frozen' || '냉동고':
-        storageType = '냉동고';
+      case 'frozen' || '냉동실':
+        storageType = '냉동실';
         break;
-      case 'room' || '상온':
-        storageType = '상온';
+      case 'room' || '실온':
+        storageType = '실온';
         break;
       default:
         storageType = 'unknown';
@@ -101,8 +98,7 @@ class _EditFoodDataState extends State<EditFoodData> {
               .collection('food_image')
               .where('id', isEqualTo: imagePath)
               .snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
               return Text("Error: ${snapshot.error}");
             }
@@ -205,8 +201,7 @@ class _EditFoodDataState extends State<EditFoodData> {
                   });
                 },
               ),
-              Text('${widget.foodEdit.quantity}',
-                  style: const TextStyle(fontSize: 16)),
+              Text('${widget.foodEdit.quantity}', style: const TextStyle(fontSize: 16)),
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
@@ -231,8 +226,7 @@ class _EditFoodDataState extends State<EditFoodData> {
     );
   }
 
-  Positioned buildDateSection(
-      String title, DateTime date, VoidCallback onPressed) {
+  Positioned buildDateSection(String title, DateTime date, VoidCallback onPressed) {
     return Positioned(
       top: title == '등록일' ? 260 : 300,
       left: 50,
@@ -245,10 +239,7 @@ class _EditFoodDataState extends State<EditFoodData> {
             onPressed: onPressed,
             child: Text(
               DateFormat('yyyy-MM-dd').format(date),
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
             ),
           ),
         ],
@@ -297,13 +288,13 @@ class _EditFoodDataState extends State<EditFoodData> {
           foodEdit.exp_day = Timestamp.fromDate(expirationDate);
           foodEdit.memo = noteController.text;
           switch (storageType) {
-            case '냉장고':
+            case '냉장실':
               foodEdit.type = 'cool';
               break;
-            case '냉동고':
+            case '냉동실':
               foodEdit.type = 'frozen';
               break;
-            case '상온':
+            case '실온':
               foodEdit.type = 'room';
               break;
             default:
@@ -313,8 +304,7 @@ class _EditFoodDataState extends State<EditFoodData> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      EditFirestoreData(docId: docId, foodEdit: foodEdit)));
+                  builder: (context) => EditFirestoreData(docId: docId, foodEdit: foodEdit)));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
@@ -329,8 +319,8 @@ class _EditFoodDataState extends State<EditFoodData> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context, DateTime initialDate,
-      Function(DateTime) onDateSelected) async {
+  Future<void> _selectDate(
+      BuildContext context, DateTime initialDate, Function(DateTime) onDateSelected) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,

@@ -12,8 +12,7 @@ class EditFoodMoreScreen extends StatefulWidget {
   final FoodEdit foodEdit;
   final String docId;
 
-  const EditFoodMoreScreen(
-      {Key? key, required this.foodEdit, required this.docId})
+  const EditFoodMoreScreen({Key? key, required this.foodEdit, required this.docId})
       : super(key: key);
 
   @override

@@ -293,8 +293,7 @@ class AuthWidgetState extends State<AuthWidget> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     if (isLoading) const LoadingIndicator(),
-                    if (!isLoading)
-                      ...(isInput ? getInputWidget() : getResultWidget()),
+                    if (!isLoading) ...(isInput ? getInputWidget() : getResultWidget()),
                   ],
                 ),
               ),

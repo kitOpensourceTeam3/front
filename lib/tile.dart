@@ -42,8 +42,7 @@ class NewTile extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => EditFoodScreen(docId: docId!)),
+                  MaterialPageRoute(builder: (context) => EditFoodScreen(docId: docId!)),
                 );
               },
             ),
