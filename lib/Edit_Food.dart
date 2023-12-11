@@ -30,12 +30,8 @@ class _EditFoodScreenState extends State<EditFoodScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('food_data')
-            .doc(widget.docId)
-            .snapshots(),
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        stream: FirebaseFirestore.instance.collection('food_data').doc(widget.docId).snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           }

@@ -11,8 +11,7 @@ class EditFirestoreData extends StatelessWidget {
   final String docId;
   final FoodEdit foodEdit;
 
-  const EditFirestoreData(
-      {super.key, required this.docId, required this.foodEdit});
+  const EditFirestoreData({super.key, required this.docId, required this.foodEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +26,7 @@ class EditFirestoreData extends StatelessWidget {
         'memo': foodEdit.memo,
       };
 
-      CollectionReference foodDataCollection =
-          FirebaseFirestore.instance.collection("food_data");
+      CollectionReference foodDataCollection = FirebaseFirestore.instance.collection("food_data");
       await foodDataCollection.doc(docId).update(jsonData);
     }
 

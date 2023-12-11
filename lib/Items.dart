@@ -65,8 +65,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const AuthWidget()),
+                      MaterialPageRoute(builder: (context) => const AuthWidget()),
                     );
                   }
                 },
@@ -100,8 +99,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add),
@@ -137,8 +135,7 @@ class _FoodListTabState extends State<FoodListTab> {
   }
 
   void refreshFoodData() {
-    foodDataFuture =
-        RefreshFoodData.instance.getFoodDataByUidAndType(getUserUid());
+    foodDataFuture = RefreshFoodData.instance.getFoodDataByUidAndType(getUserUid());
   }
 
   @override
@@ -164,8 +161,7 @@ class _FoodListTabState extends State<FoodListTab> {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
                     String foodName = nameSnapshot.data!;
-                    String? docId =
-                        itemProvider.foodData[widget.tabType]?[index].id;
+                    String? docId = itemProvider.foodData[widget.tabType]?[index].id;
 
                     // 데이터에 따라 NewTile 위젯 또는 다른 위젯 반환
                     return NewTile(
@@ -213,11 +209,7 @@ class _FoodListTabState extends State<FoodListTab> {
   }
 
   void deleteFoodData(String? docId) async {
-    await FirebaseFirestore.instance
-        .collection('food_data')
-        .doc(docId)
-        .delete()
-        .then((_) {
+    await FirebaseFirestore.instance.collection('food_data').doc(docId).delete().then((_) {
       print('Document successfully deleted');
       context.read<ItemsProvider>().loadFoodData();
       setState(() {}); // 상태 업데이트
@@ -230,18 +222,15 @@ class _FoodListTabState extends State<FoodListTab> {
   }
 }
 
-Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
-    String uid) async {
+Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) async {
   Map<String, List<DocumentSnapshot>> foodData = {
     'cool': [],
     'frozen': [],
     'room': [],
   };
 
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_data')
-      .where('uid', isEqualTo: uid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
 
   for (var doc in querySnapshot.docs) {
     String type = doc['type'];
@@ -251,10 +240,8 @@ Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
 }
 
 Future<String> getFoodNameByFid(int fid) async {
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_image')
-      .where('id', isEqualTo: fid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_image').where('id', isEqualTo: fid).get();
 
   if (querySnapshot.docs.isNotEmpty) {
     return querySnapshot.docs[0]['name'];
