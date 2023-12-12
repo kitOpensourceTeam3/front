@@ -18,7 +18,7 @@ class FoodData {
     this.quantity = 1,
     required this.exp_date,
     required this.namePath,
-    this.selectedStorage = '냉장고',
+    this.selectedStorage = '냉장실',
     DateTime? selectedDate,
     DateTime? expirationDate,
     TextEditingController? noteController,

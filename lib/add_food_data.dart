@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/add_firestore_data.dart';
 import 'package:flutter_application/data_class.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_application/loding.dart';
 
 class AddFoodData extends StatefulWidget {
   final FoodData foodData;
@@ -15,15 +16,12 @@ class AddFoodData extends StatefulWidget {
 }
 
 class _AddFoodDataState extends State<AddFoodData> {
-  final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
-  final TextStyle boldStyle =
-      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final TextStyle hintStyle =
-      const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
+  final List<String> storageOptions = ['냉장실', '냉동실', '실온'];
+  final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
   final InputBorder borderStyle =
       const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
-  final EdgeInsetsGeometry paddingSymmetric10 =
-      const EdgeInsets.symmetric(horizontal: 10);
+  final EdgeInsetsGeometry paddingSymmetric10 = const EdgeInsets.symmetric(horizontal: 10);
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +70,7 @@ class _AddFoodDataState extends State<AddFoodData> {
               .collection('food_image')
               .where('id', isEqualTo: imagePath)
               .snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
               return Text("Error: ${snapshot.error}");
             }
@@ -95,7 +92,7 @@ class _AddFoodDataState extends State<AddFoodData> {
               }
             }
 
-            return const CircularProgressIndicator();
+            return const LoadingIndicator();
           },
         ),
       ),
@@ -176,8 +173,7 @@ class _AddFoodDataState extends State<AddFoodData> {
                   });
                 },
               ),
-              Text('${widget.foodData.quantity}',
-                  style: const TextStyle(fontSize: 16)),
+              Text('${widget.foodData.quantity}', style: const TextStyle(fontSize: 16)),
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
@@ -202,8 +198,7 @@ class _AddFoodDataState extends State<AddFoodData> {
     );
   }
 
-  Positioned buildDateSection(
-      String title, DateTime date, VoidCallback onPressed) {
+  Positioned buildDateSection(String title, DateTime date, VoidCallback onPressed) {
     return Positioned(
       top: title == '등록일' ? 260 : 300,
       left: 50,
@@ -216,10 +211,7 @@ class _AddFoodDataState extends State<AddFoodData> {
             onPressed: onPressed,
             child: Text(
               DateFormat('yyyy-MM-dd').format(date),
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
             ),
           ),
         ],
@@ -264,8 +256,7 @@ class _AddFoodDataState extends State<AddFoodData> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      AddFirestoreData(foodId: foodId, foodData: foodData)));
+                  builder: (context) => AddFirestoreData(foodId: foodId, foodData: foodData)));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
@@ -280,8 +271,8 @@ class _AddFoodDataState extends State<AddFoodData> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context, DateTime initialDate,
-      Function(DateTime) onDateSelected) async {
+  Future<void> _selectDate(
+      BuildContext context, DateTime initialDate, Function(DateTime) onDateSelected) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,

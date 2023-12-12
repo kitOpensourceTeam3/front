@@ -9,9 +9,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application/items_provider.dart';
 import 'package:flutter_application/refresh_fooddata.dart';
+import 'package:flutter_application/tile.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter_application/main.dart';
+import 'package:flutter_application/loding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,8 +65,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const AuthWidget()),
+                      MaterialPageRoute(builder: (context) => const AuthWidget()),
                     );
                   }
                 },
@@ -98,8 +99,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const FoodListScreen()),
+                  MaterialPageRoute(builder: (context) => const FoodListScreen()),
                 );
               },
               child: const Icon(Icons.add),
@@ -135,8 +135,7 @@ class _FoodListTabState extends State<FoodListTab> {
   }
 
   void refreshFoodData() {
-    foodDataFuture =
-        RefreshFoodData.instance.getFoodDataByUidAndType(getUserUid());
+    foodDataFuture = RefreshFoodData.instance.getFoodDataByUidAndType(getUserUid());
   }
 
   @override
@@ -157,13 +156,12 @@ class _FoodListTabState extends State<FoodListTab> {
                 future: getFoodNameByFid(id),
                 builder: (context, nameSnapshot) {
                   if (nameSnapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const LoadingIndicator();
                   } else if (nameSnapshot.hasError) {
                     return Text('Error: ${nameSnapshot.error}');
                   } else if (nameSnapshot.hasData) {
                     String foodName = nameSnapshot.data!;
-                    String? docId =
-                        itemProvider.foodData[widget.tabType]?[index].id;
+                    String? docId = itemProvider.foodData[widget.tabType]?[index].id;
 
                     // 데이터에 따라 NewTile 위젯 또는 다른 위젯 반환
                     return NewTile(
@@ -190,7 +188,7 @@ class _FoodListTabState extends State<FoodListTab> {
           );
         } else {
           // foodData가 비어있으면 로딩 인디케이터 표시
-          return const CircularProgressIndicator();
+          return const LoadingIndicator();
         }
       },
     );
@@ -211,11 +209,7 @@ class _FoodListTabState extends State<FoodListTab> {
   }
 
   void deleteFoodData(String? docId) async {
-    await FirebaseFirestore.instance
-        .collection('food_data')
-        .doc(docId)
-        .delete()
-        .then((_) {
+    await FirebaseFirestore.instance.collection('food_data').doc(docId).delete().then((_) {
       print('Document successfully deleted');
       context.read<ItemsProvider>().loadFoodData();
       setState(() {}); // 상태 업데이트
@@ -228,18 +222,15 @@ class _FoodListTabState extends State<FoodListTab> {
   }
 }
 
-Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
-    String uid) async {
+Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(String uid) async {
   Map<String, List<DocumentSnapshot>> foodData = {
     'cool': [],
     'frozen': [],
     'room': [],
   };
 
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_data')
-      .where('uid', isEqualTo: uid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_data').where('uid', isEqualTo: uid).get();
 
   for (var doc in querySnapshot.docs) {
     String type = doc['type'];
@@ -249,10 +240,8 @@ Future<Map<String, List<DocumentSnapshot>>> getFoodDataByUidAndType(
 }
 
 Future<String> getFoodNameByFid(int fid) async {
-  var querySnapshot = await FirebaseFirestore.instance
-      .collection('food_image')
-      .where('id', isEqualTo: fid)
-      .get();
+  var querySnapshot =
+      await FirebaseFirestore.instance.collection('food_image').where('id', isEqualTo: fid).get();
 
   if (querySnapshot.docs.isNotEmpty) {
     return querySnapshot.docs[0]['name'];
@@ -264,61 +253,4 @@ Future<String> getFoodNameByFid(int fid) async {
 String getUserUid() {
   User? user = FirebaseAuth.instance.currentUser;
   return user?.uid ?? '';
-}
-
-class NewTile extends StatelessWidget {
-  final String? docId;
-  final String remainingDays;
-  final String foodName;
-  final int quantity;
-  final Function()? onDelete;
-  final Function()? onDecrease;
-
-  const NewTile({
-    required this.docId,
-    super.key,
-    required this.remainingDays,
-    required this.foodName,
-    required this.quantity,
-    this.onDelete,
-    this.onDecrease,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      child: ListTile(
-        title: Text(foodName),
-        leading: Text(
-          remainingDays,
-          style: const TextStyle(fontSize: 18),
-        ),
-        subtitle: Text('수량: $quantity'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.remove),
-              onPressed: quantity > 1 ? onDecrease : null,
-            ),
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EditFoodScreen(docId: docId!)),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: onDelete,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

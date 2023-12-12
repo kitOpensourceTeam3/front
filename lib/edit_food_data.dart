@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/data_class.dart';
 import 'package:flutter_application/edit_firestore_data.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_application/loding.dart';
 
 class EditFoodData extends StatefulWidget {
   final int imagePath;
@@ -22,7 +23,7 @@ class EditFoodData extends StatefulWidget {
 }
 
 class _EditFoodDataState extends State<EditFoodData> {
-  final List<String> storageOptions = ['냉장고', '냉동고', '상온'];
+  final List<String> storageOptions = ['냉장실', '냉동실', '실온'];
   final TextStyle boldStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
   final TextStyle hintStyle = const TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
   final InputBorder borderStyle =
@@ -38,14 +39,14 @@ class _EditFoodDataState extends State<EditFoodData> {
   @override
   Widget build(BuildContext context) {
     switch (storageType) {
-      case 'cool' || '냉장고':
-        storageType = '냉장고';
+      case 'cool' || '냉장실':
+        storageType = '냉장실';
         break;
-      case 'frozen' || '냉동고':
-        storageType = '냉동고';
+      case 'frozen' || '냉동실':
+        storageType = '냉동실';
         break;
-      case 'room' || '상온':
-        storageType = '상온';
+      case 'room' || '실온':
+        storageType = '실온';
         break;
       default:
         storageType = 'unknown';
@@ -119,7 +120,7 @@ class _EditFoodDataState extends State<EditFoodData> {
               }
             }
 
-            return const CircularProgressIndicator();
+            return const LoadingIndicator();
           },
         ),
       ),
@@ -287,13 +288,13 @@ class _EditFoodDataState extends State<EditFoodData> {
           foodEdit.exp_day = Timestamp.fromDate(expirationDate);
           foodEdit.memo = noteController.text;
           switch (storageType) {
-            case '냉장고':
+            case '냉장실':
               foodEdit.type = 'cool';
               break;
-            case '냉동고':
+            case '냉동실':
               foodEdit.type = 'frozen';
               break;
-            case '상온':
+            case '실온':
               foodEdit.type = 'room';
               break;
             default:

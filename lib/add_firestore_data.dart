@@ -9,21 +9,20 @@ class AddFirestoreData extends StatelessWidget {
   final int foodId;
   final FoodData foodData;
 
-  const AddFirestoreData(
-      {super.key, required this.foodId, required this.foodData});
+  const AddFirestoreData({super.key, required this.foodId, required this.foodData});
 
   @override
   Widget build(BuildContext context) {
     Future<void> createNewFoodData(String uid) async {
       String storageType;
       switch (foodData.selectedStorage) {
-        case '냉장고':
+        case '냉장실':
           storageType = 'cool';
           break;
-        case '냉동고':
+        case '냉동실':
           storageType = 'frozen';
           break;
-        case '상온':
+        case '실온':
           storageType = 'room';
           break;
         default:
@@ -41,8 +40,7 @@ class AddFirestoreData extends StatelessWidget {
         'memo': foodData.noteController.text,
       };
 
-      CollectionReference foodDataCollection =
-          FirebaseFirestore.instance.collection("food_data");
+      CollectionReference foodDataCollection = FirebaseFirestore.instance.collection("food_data");
       await foodDataCollection.add(jsonData);
     }
 

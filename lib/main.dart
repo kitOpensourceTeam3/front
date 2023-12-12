@@ -8,7 +8,7 @@ import 'package:flutter_application/items_provider.dart';
 import 'package:provider/provider.dart';
 import '../firebase_options.dart';
 import 'package:flutter_application/Items.dart' as items_app;
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_application/loding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -293,8 +293,7 @@ class AuthWidgetState extends State<AuthWidget> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     if (isLoading) const LoadingIndicator(),
-                    if (!isLoading)
-                      ...(isInput ? getInputWidget() : getResultWidget()),
+                    if (!isLoading) ...(isInput ? getInputWidget() : getResultWidget()),
                   ],
                 ),
               ),
@@ -302,25 +301,6 @@ class AuthWidgetState extends State<AuthWidget> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class LoadingIndicator extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const LoadingIndicator({
-    Key? key,
-    this.size = 50.0,
-    this.color = Colors.blue,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SpinKitThreeInOut(
-      color: color,
-      size: size,
     );
   }
 }
